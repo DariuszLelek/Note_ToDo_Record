@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="black_overlay">#66000000</color>
+    <color name="bottom_tab_color">#e8e8e8</color>
+
+    <!-- List Menu -->
+    <color name="list_menu_delete_back">#f44242</color>
+    <color name="list_menu_edit_back">#cecece</color>
+    <color name="list_icon_low_priority">#20bf23</color>
+    <color name="list_icon_medium_priority">#bfaf1f</color>
+    <color name="list_icon_high_priority">#bf1f1f</color>
+
+</resources>

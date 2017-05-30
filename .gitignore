@@ -1,3 +1,11 @@
+# build
+/app/build
+/build
+
+# test
+/app/src/test
+/app/src/androidtest
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
@@ -45,3 +53,7 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+.idea
+.gradle
+
+app/src/main/res/values/ads.xml
