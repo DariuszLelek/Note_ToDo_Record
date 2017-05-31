@@ -18,7 +18,7 @@ public class Utils {
 
         StringBuilder sb = new StringBuilder();
         sb.append(calendar.get(Calendar.DAY_OF_MONTH)).append(DATE_SEPARATOR);
-        sb.append(String.format("%02d", calendar.get(Calendar.MONTH))).append(DATE_SEPARATOR);
+        sb.append(String.format("%02d", calendar.get(Calendar.MONTH) + 1)).append(DATE_SEPARATOR);
         sb.append(calendar.get(Calendar.YEAR));
 
         return sb.toString();

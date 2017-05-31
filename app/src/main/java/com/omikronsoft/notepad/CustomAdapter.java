@@ -8,8 +8,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.omikronsoft.notepad.containers.NoteData;
+import com.omikronsoft.notepad.containers.Priority;
+import com.omikronsoft.notepad.containers.ToDoData;
 import com.omikronsoft.notepad.painting.PaintingResources;
-import com.omikronsoft.notepad.providers.NoteDataProvider;
+import com.omikronsoft.notepad.providers.DataProvider;
 
 import java.util.List;
 
@@ -19,7 +21,7 @@ import java.util.List;
  */
 
 public class CustomAdapter extends BaseAdapter {
-    private final List<String> itemList;
+    private List<String> itemList;
     private final Context context;
     private final ListItemType itemType;
 
@@ -27,6 +29,10 @@ public class CustomAdapter extends BaseAdapter {
         this.itemList = itemList;
         this.context = context;
         this.itemType = itemType;
+    }
+
+    public void updateList(List<String> itemList){
+        this.itemList = itemList;
     }
 
     @Override
@@ -61,11 +67,24 @@ public class CustomAdapter extends BaseAdapter {
 
         switch (itemType) {
             case NOTE_ITEM:
-                NoteData nd = NoteDataProvider.getInstance().getNoteData(item);
+                NoteData nd = DataProvider.getInstance().getNoteData(item);
 
-                holder.iv_icon.setImageResource(itemType.getIconResource());
-                holder.iv_icon.setColorFilter(PaintingResources.getInstance().getListIconPaint(nd.getPriority()));
-                holder.tv_datetime.setText(nd.getEditTimeString());
+                if(nd != null){
+                    holder.iv_icon.setImageResource(itemType.getIconResource());
+                    holder.iv_icon.setColorFilter(PaintingResources.getInstance().getListIconPaint(Priority.getPriorityByValue(nd.getPriority())));
+                    holder.tv_datetime.setText(nd.getFormattedEditTime());
+                }
+
+                break;
+            case TODO_ITEM:
+                ToDoData tdd = DataProvider.getInstance().getToDoData(item);
+
+                if(tdd != null){
+                    holder.iv_icon.setImageResource(itemType.getIconResource());
+                    holder.iv_icon.setColorFilter(PaintingResources.getInstance().getListIconPaint(Priority.getPriorityByValue(tdd.getPriority())));
+                    holder.tv_datetime.setText(tdd.getFormattedEditTime());
+                }
+
                 break;
             case RECORD_ITEM:
                 break;

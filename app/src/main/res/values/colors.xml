@@ -7,10 +7,21 @@
     <color name="black_overlay">#66000000</color>
     <color name="bottom_tab_color">#e8e8e8</color>
 
+    <color name="loading_back">#64ffffff</color>'
+    <color name="add_item_back">#e8ffffff</color>
+    <color name="fab_color">#358fa8</color>
+
+
+    <color name="toggle_radio_back">#efefef</color>
+
+    <!-- List -->
+    <color name="list_back">#f5ffef</color>
+
     <!-- List Menu -->
     <color name="list_menu_delete_back">#f44242</color>
+    <color name="list_menu_complete_back">#32c627</color>
     <color name="list_menu_edit_back">#cecece</color>
-    <color name="list_icon_low_priority">#20bf23</color>
+    <color name="list_icon_low_priority">#000000</color>
     <color name="list_icon_medium_priority">#bfaf1f</color>
     <color name="list_icon_high_priority">#bf1f1f</color>
 

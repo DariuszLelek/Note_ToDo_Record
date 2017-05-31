@@ -17,4 +17,19 @@ public enum Priority {
     public int getValue(){
         return value;
     }
+
+    public static Priority getPriorityByValue(int value){
+        Priority result = LOW;
+        switch (value){
+            case 1:
+                result = MEDIUM;
+                break;
+            case 2:
+                result = HIGH;
+                break;
+            default:
+                break;
+        }
+        return result;
+    }
 }

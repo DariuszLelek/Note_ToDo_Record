@@ -1,10 +1,13 @@
 package com.omikronsoft.notepad;
 
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
 import com.omikronsoft.notepad.containers.Priority;
+
+import static java.lang.reflect.Array.getInt;
 
 /**
  * Created by Dariusz Lelek on 5/30/2017.
@@ -17,10 +20,16 @@ public class Globals {
     private DisplayMetrics metrics;
     private float pixelDensity;
     private Priority selectedPriority;
+    private SharedPreferences prefs;
+    private ListItemType selectedListType;
 
     private Globals(){
-        // todo read from prefs
-        selectedPriority = Priority.LOW;
+
+    }
+
+    public void loadPrefsData(){
+        selectedPriority = Priority.getPriorityByValue(prefs.getInt(res.getString(R.string.selected_priority_key), 0));
+        selectedListType = ListItemType.getListTypeByValue(prefs.getInt(res.getString(R.string.selected_list_type_key), 0));
     }
 
     public Resources getRes() {
@@ -36,8 +45,33 @@ public class Globals {
         return selectedPriority;
     }
 
+    public ListItemType getSelectedListType() {
+        return selectedListType;
+    }
+
     public void setSelectedPriority(Priority selectedPriority) {
         this.selectedPriority = selectedPriority;
+
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putInt(res.getString(R.string.selected_priority_key), selectedPriority.getValue());
+        edit.apply();
+    }
+
+    public void setSelectedListType(ListItemType selectedListType) {
+        this.selectedListType = selectedListType;
+
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putInt(res.getString(R.string.selected_list_type_key), selectedPriority.getValue());
+        edit.apply();
+    }
+
+
+    public void setPrefs(SharedPreferences prefs) {
+        this.prefs = prefs;
+    }
+
+    public SharedPreferences getPrefs() {
+        return prefs;
     }
 
     public int dp2px(int dp) {
