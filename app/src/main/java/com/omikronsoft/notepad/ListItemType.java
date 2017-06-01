@@ -12,20 +12,32 @@ import static com.omikronsoft.notepad.containers.Priority.MEDIUM;
  */
 
 public enum ListItemType {
-    NOTE_ITEM(R.drawable.ic_note),
-    RECORD_ITEM(R.drawable.ic_record),
-    TODO_ITEM(R.drawable.ic_todo),
-    DRAW_ITEM(0);
+    NOTE_ITEM(R.drawable.ic_note, R.string.note_data_key, false),
+    RECORD_ITEM(R.drawable.ic_record, R.string.record_data_key, false),
+    TODO_ITEM(R.drawable.ic_todo_box, R.string.todo_data_key, false),
+    DRAW_ITEM(0, R.string.draw_data_key, true);
 
 
     public int value;
+    public String prefsKey;
+    public boolean noPriority;
 
-    ListItemType(int value) {
+    ListItemType(int value, int prefsKeyID, boolean noPriority) {
+        this.noPriority = noPriority;
         this.value = value;
+        this.prefsKey = Globals.getInstance().getRes().getString(prefsKeyID);
     }
 
     public int getIconResource(){
         return value;
+    }
+
+    public String getPrefsKey() {
+        return prefsKey;
+    }
+
+    public boolean hasPriority(){
+        return !noPriority;
     }
 
     public static ListItemType getListTypeByValue(int value){

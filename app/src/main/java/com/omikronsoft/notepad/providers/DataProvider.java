@@ -2,13 +2,15 @@ package com.omikronsoft.notepad.providers;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 
 import com.omikronsoft.notepad.Globals;
 import com.omikronsoft.notepad.ListItemType;
 import com.omikronsoft.notepad.R;
+import com.omikronsoft.notepad.containers.Content;
 import com.omikronsoft.notepad.containers.ItemData;
-import com.omikronsoft.notepad.containers.NoteData;
-import com.omikronsoft.notepad.containers.ToDoData;
+import com.omikronsoft.notepad.containers.Priority;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import static com.omikronsoft.notepad.ListItemType.DRAW_ITEM;
 import static com.omikronsoft.notepad.ListItemType.NOTE_ITEM;
@@ -31,129 +32,74 @@ import static com.omikronsoft.notepad.ListItemType.TODO_ITEM;
 
 public class DataProvider {
     private static DataProvider instance;
-    private Map<String, NoteData> notesData;
-    private Map<String, ToDoData> todoData;
     private Map<ListItemType, Map<String, ItemData>> itemData;
+    private Map<String, String> noteContent;
+    private Map<String, MediaPlayer> recordContent;
+    private Map<String, Bitmap> drawContent;
 
-    private String noteDataKey, dataSeparator, todoDataKey;
+    private String dataSeparator, noteContentPrefix;
     private Globals globals;
 
     private DataProvider(){
-        notesData = new TreeMap<>();
-        todoData = new TreeMap<>();
-        itemData = new HashMap<>();
-
-        itemData.put(NOTE_ITEM, new HashMap());
-        itemData.put(TODO_ITEM, new HashMap());
-        itemData.put(RECORD_ITEM, new HashMap());
-        itemData.put(DRAW_ITEM, new HashMap());
-
         globals = Globals.getInstance();
-
-        noteDataKey = globals.getRes().getString(R.string.note_data_key);
-        todoDataKey = globals.getRes().getString(R.string.todo_data_key);
-
+        itemData = new HashMap<>();
         dataSeparator = globals.getRes().getString(R.string.shared_pref_data_separator);
+        noteContentPrefix = globals.getRes().getString(R.string.note_content_key_prefix);
 
-        loadNotesData();
-        loadToDoData();
+        itemData.put(NOTE_ITEM, new HashMap<String, ItemData>());
+        itemData.put(TODO_ITEM, new HashMap<String, ItemData>());
+        itemData.put(RECORD_ITEM, new HashMap<String, ItemData>());
+        itemData.put(DRAW_ITEM, new HashMap<String, ItemData>());
+
+        loadItemData();
+        //loatContent();
     }
 
-    public NoteData getNoteData(String title){
-        return notesData.get(title);
+    // content
+
+
+    public String getNoteContent(String title){
+        return noteContent.get(title);
     }
 
-    public ToDoData getToDoData(String title){
-        return todoData.get(title);
+    public int getTotalItems(ListItemType itemType){
+        return itemData.get(itemType).size();
     }
 
-    public void addNoteData(NoteData nd){
-        notesData.put(nd.getTitle(), nd);
-        saveItemData(NOTE_ITEM);
-    }
 
-    public void addToDoData(ToDoData tdd){
-        todoData.put(tdd.getTitle(), tdd);
-        saveItemData(TODO_ITEM);
+    public void addItemData(ItemData id){
+        itemData.get(id.getItemType()).put(id.getTitle(), id);
+        saveItemData(id.getItemType());
     }
 
     public boolean itemExists(String title, ListItemType itemType){
-        boolean result = false;
-
-        switch (itemType){
-            case NOTE_ITEM:
-                result = notesData.containsKey(title);
-                break;
-            case TODO_ITEM:
-                result = todoData.containsKey(title);
-                break;
-            case RECORD_ITEM:
-                break;
-            case DRAW_ITEM:
-                break;
-            default:
-                break;
-        }
-
-        return result;
+        return itemData.get(itemType).containsKey(title);
     }
 
-    public void updateNote(String oldTitle, NoteData editedNote){
-        if(notesData.containsKey(oldTitle)){
-            notesData.remove(oldTitle);
-            notesData.put(editedNote.getTitle(), editedNote);
-        }
-        saveItemData(NOTE_ITEM);
+    public void updateItemData(String oldItemTitle, ItemData id){
+        ListItemType itemType = id.getItemType();
+        itemData.get(itemType).remove(oldItemTitle);
+        itemData.get(itemType).put(id.getTitle(), id);
+        saveItemData(itemType);
     }
 
     public void deleteItem(ListItemType itemType, String title){
-        switch (itemType){
-            case NOTE_ITEM:
-                if(notesData.containsKey(title)){
-                    notesData.remove(title);
-                }
-                saveItemData(NOTE_ITEM);
-                break;
-            case TODO_ITEM:
-                if(todoData.containsKey(title)){
-                    todoData.remove(title);
-                }
-                saveItemData(TODO_ITEM);
-                break;
-            case RECORD_ITEM:
-                break;
-            case DRAW_ITEM:
-                break;
-            default:
-                break;
-        }
+        itemData.get(itemType).remove(title);
+        saveItemData(itemType);
     }
 
-    public List<String> getTitleList(ListItemType itemType){
-        List<String> result = new ArrayList<>();
-        int selectedPriority = Globals.getInstance().getSelectedPriority().getValue();
+    public ItemData getItemData(ListItemType itemType, String title){
+        return itemData.get(itemType).get(title);
+    }
 
-        switch (itemType){
-            case NOTE_ITEM:
-                for(Map.Entry<String, NoteData> pair : notesData.entrySet()){
-                    if(pair.getValue().getPriority() >= selectedPriority){
-                        result.add(pair.getKey());
-                    }
-                }
-                break;
-            case TODO_ITEM:
-                for(Map.Entry<String, ToDoData> pair : todoData.entrySet()){
-                    if(pair.getValue().getPriority() >= selectedPriority){
-                        result.add(pair.getKey());
-                    }
-                }
-                break;
-            case RECORD_ITEM:
-                break;
-            case DRAW_ITEM:
-                break;
-            default:
-                break;
+    public List<String> getTitleListByPriority(ListItemType itemType){
+        List<String> result = new ArrayList<>();
+        int selectedPriority = itemType.hasPriority() ? Globals.getInstance().getSelectedPriority().getValue() : Priority.LOW.getValue();
+
+        for(Map.Entry<String, ItemData> pair : itemData.get(itemType).entrySet()){
+            if(pair.getValue().getPriority() >= selectedPriority){
+                result.add(pair.getKey());
+            }
         }
 
         Collections.sort(result);
@@ -162,128 +108,89 @@ public class DataProvider {
 
     public void saveItemData(ListItemType itemType){
         Set<String> dataSet = new HashSet<>();
-        String dataKey = "";
+        String dataKey = itemType.getPrefsKey();
+        SharedPreferences.Editor edit = globals.getPrefs().edit();
+
+        for(ItemData id : itemData.get(itemType).values()){
+            dataSet.add(getItemDataString(id));
+            saveContent(edit, id);
+        }
+
+        edit.putStringSet(dataKey, dataSet);
+        edit.apply();
+    }
+
+    private String getItemDataString(ItemData id){
+        return id.getTitle() + dataSeparator + id.getPriority() + dataSeparator + id.getEditTime();
+    }
+
+    private void loadItemData(){
+        for(ListItemType itemType : ListItemType.values()){
+
+            String prefsKey = itemType.getPrefsKey();
+            Set<String> savedDataSet = globals.getPrefs().getStringSet(prefsKey, null);
+
+            if(savedDataSet != null && !savedDataSet.isEmpty()){
+                for(String dataString : savedDataSet){
+                    String[] parts = dataString.split(dataSeparator, -1);
+
+                    if(parts.length == ItemData.SAVE_DATA_LENGTH){
+                        String title = parts[0];
+                        if(!title.isEmpty()){
+                            try{
+                                int priority = Integer.parseInt(parts[1]);
+                                long editTime = Long.parseLong(parts[2]);
+                                Content content = getContent(itemType, title);
+
+                                if(content != null){
+                                    ItemData id = new ItemData(itemType, title, priority, editTime);
+                                    id.setContent(content);
+                                    itemData.get(itemType).put(title, id);
+                                }
+                            }catch (NumberFormatException e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void saveContent(SharedPreferences.Editor edit, ItemData id){
+        switch (id.getItemType()){
+            case NOTE_ITEM:
+                edit.putString(noteContentPrefix+id.getTitle(), id.getContent().getNoteContent());
+                break;
+            case DRAW_ITEM:
+                break;
+            case RECORD_ITEM:
+                break;
+            default:
+            case TODO_ITEM:
+                break;
+        }
+    }
+
+    private Content getContent(ListItemType itemType, String title){
+        Content content = null;
 
         switch (itemType){
             case NOTE_ITEM:
-                dataKey = noteDataKey;
-                for(NoteData nd :  notesData.values()){
-                    dataSet.add(getNoteDataString(nd));
-                }
-                break;
-            case TODO_ITEM:
-                dataKey = todoDataKey;
-                for(ToDoData tdd :  todoData.values()){
-                    dataSet.add(getToDoDataString(tdd));
-                }
+                content = new Content();
+                content.setNoteContent(globals.getPrefs().getString(noteContentPrefix+title, ""));
                 break;
             case RECORD_ITEM:
                 break;
             case DRAW_ITEM:
                 break;
             default:
+            case TODO_ITEM:
+                content = new Content();
                 break;
         }
 
-        if(!dataKey.isEmpty()){
-            SharedPreferences.Editor edit = globals.getPrefs().edit();
-            edit.putStringSet(dataKey, dataSet);
-            edit.apply();
-        }
-    }
-
-    private void loadItemData(){
-        for(ListItemType itemType : ListItemType.values()){
-
-        }
-    }
-
-    private void loadNotesData(){
-        notesData.clear();
-        Set<String> noteDataSet = globals.getPrefs().getStringSet(noteDataKey, null);
-
-        if(noteDataSet != null && !noteDataSet.isEmpty()){
-            for(String noteDataString : noteDataSet){
-                String[] parts = noteDataString.split(dataSeparator, -1);
-
-                NoteData noteData = tryGetNoteData(parts, 4);
-
-                if(noteData != null){
-                    notesData.put(noteData.getTitle(), noteData);
-                }
-            }
-        }
-    }
-
-    private void loadToDoData(){
-        todoData.clear();
-        Set<String> todoDataSet = globals.getPrefs().getStringSet(todoDataKey, null);
-
-        if(todoDataSet != null && !todoDataSet.isEmpty()){
-            for(String todoDataString : todoDataSet){
-                String[] parts = todoDataString.split(dataSeparator, -1);
-                ToDoData tdd = tryGetToDoData(parts, 3);
-
-                if(tdd != null){
-                    todoData.put(tdd.getTitle(), tdd);
-                }
-            }
-        }
-    }
-
-
-    private ToDoData tryGetToDoData(String[] savedToDoDataParts, int length){
-        ToDoData tdd = null;
-
-        if(savedToDoDataParts.length == length){
-            boolean dataValid = !savedToDoDataParts[0].isEmpty();
-            if(dataValid){
-                try{
-                    int priority = Integer.parseInt(savedToDoDataParts[1]);
-                    long editTime = Long.parseLong(savedToDoDataParts[2]);
-
-                    tdd = new ToDoData(savedToDoDataParts[0], priority, editTime);
-                }catch (NumberFormatException e){
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return tdd;
-    }
-
-    private NoteData tryGetNoteData(String[] savedNoteDataParts, int length){
-        NoteData nd = null;
-
-        if(savedNoteDataParts.length == length){
-            boolean dataValid = !savedNoteDataParts[0].isEmpty();
-            if(dataValid){
-                try{
-                    int priority = Integer.parseInt(savedNoteDataParts[1]);
-                    long editTime = Long.parseLong(savedNoteDataParts[2]);
-
-                    nd = new NoteData(savedNoteDataParts[0], priority, editTime, savedNoteDataParts[3]);
-                }catch (NumberFormatException e){
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return nd;
-    }
-
-    private String getNoteDataString(NoteData nd){
-        StringBuilder sb = new StringBuilder();
-        sb.append(nd.getTitle()).append(dataSeparator).append(nd.getPriority()).append(dataSeparator);
-        sb.append(nd.getEditTime()).append(dataSeparator).append(nd.getContent());
-        return sb.toString();
-    }
-
-    private String getToDoDataString(ToDoData tdd){
-        StringBuilder sb = new StringBuilder();
-        sb.append(tdd.getTitle()).append(dataSeparator).append(tdd.getPriority()).append(dataSeparator);
-        sb.append(tdd.getEditTime());
-        return sb.toString();
+        return content;
     }
 
     public synchronized static DataProvider getInstance() {

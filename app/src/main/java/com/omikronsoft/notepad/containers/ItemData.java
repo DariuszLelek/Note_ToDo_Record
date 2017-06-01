@@ -16,6 +16,8 @@ public class ItemData {
     private Content content;
     private String formattedEditTime;
 
+    public static final int SAVE_DATA_LENGTH = 3;
+
     public ItemData(ListItemType itemType, String title, int priority, long editTime) {
         this.itemType = itemType;
         this.title = title;
@@ -50,6 +52,10 @@ public class ItemData {
     public void setEditTime(long editTime) {
         this.editTime = editTime;
         this.formattedEditTime = Utils.getInstance().getFormattedDate(editTime);
+    }
+
+    public String getFormattedEditTime() {
+        return formattedEditTime;
     }
 
     public Content getContent() {

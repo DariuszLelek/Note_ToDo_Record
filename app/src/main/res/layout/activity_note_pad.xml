@@ -17,6 +17,7 @@
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/main_layout"
         android:orientation="vertical"
         android:visibility="visible">
 
@@ -115,6 +116,24 @@
                 android:layout_height="match_parent">
 
                 <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center">
+
+                    <TextView
+                        android:id="@+id/txt_total_counter"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/main_layout"
+                        android:paddingLeft="2sp"
+                        android:paddingRight="2sp"
+                        android:paddingTop="2dp"
+                        android:text="Total:"
+                        android:textColor="@color/toggle_radio_back"
+                        android:textSize="12sp" />
+                </FrameLayout>
+
+                <FrameLayout
                     android:id="@+id/floating_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -164,6 +183,7 @@
                         android:paddingTop="4dp"
                         android:text="Display items according to importance:"
                         android:textAlignment="center"
+                        android:textColor="@color/main_layout"
                         android:textSize="11sp" />
                 </FrameLayout>
 
@@ -220,12 +240,14 @@
         android:id="@+id/item_add_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/add_item_back"
-        android:visibility="invisible">
+        android:background="@color/list_back"
+        android:visibility="visible">
 
         <LinearLayout
+            android:id="@+id/add_main_back"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/main_layout"
             android:orientation="vertical"
             android:padding="6dp"
             android:weightSum="1">
@@ -241,31 +263,91 @@
                 android:layout_weight="0"
                 android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/txt_title"
+                <LinearLayout
+                    android:id="@+id/title_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:ems="10"
-                    android:hint="Title"
-                    android:imeOptions="actionDone"
-                    android:inputType="textPersonName"
-                    android:paddingTop="12sp"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/black" />
+                    android:background="@color/list_back"
+                    android:orientation="horizontal"
+                    android:paddingBottom="6dp"
+                    android:paddingRight="12dp"
+                    android:paddingTop="6dp">
 
-                <EditText
-                    android:id="@+id/txt_note_content"
+                    <ImageView
+                        android:id="@+id/image_add_layout"
+                        android:layout_width="100sp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:adjustViewBounds="false"
+                        android:cropToPadding="true"
+                        android:padding="6dp"
+                        app:srcCompat="@drawable/ic_note" />
+
+                    <EditText
+                        android:id="@+id/txt_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:hint="Title"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPersonName"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/black"
+                        android:textSize="24sp" />
+
+                </LinearLayout>
+
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="200sp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:ems="10"
-                    android:gravity="bottom"
-                    android:hint="Note"
-                    android:imeOptions="actionDone"
-                    android:inputType="textMultiLine"
-                    android:textAlignment="center"
-                    android:visibility="invisible" />
+                    android:paddingBottom="6dp"
+                    android:paddingTop="6dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txt_quote"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="30sp"
+                            android:gravity="bottom|center"
+                            android:textColor="@android:color/darker_gray"
+                            android:textSize="18sp"
+                            android:textStyle="italic" />
+
+                        <TextView
+                            android:id="@+id/txt_author"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:paddingRight="50sp"
+                            android:textAlignment="textEnd"
+                            android:textColor="@android:color/darker_gray"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/txt_note_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="200sp"
+                        android:layout_weight="1"
+                        android:background="@color/note_background_color"
+                        android:ems="10"
+                        android:gravity="top|left"
+                        android:hint="Note"
+                        android:imeOptions="actionDone"
+                        android:inputType="textMultiLine"
+                        android:padding="12dp"
+                        android:textSize="24sp"
+                        android:visibility="invisible" />
+                </FrameLayout>
 
             </LinearLayout>
 
@@ -273,7 +355,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0"
-                android:gravity="bottom|center"
+                android:gravity="top|bottom|center"
                 android:orientation="vertical">
 
                 <TextView
@@ -281,7 +363,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
-                    android:padding="6dp"
+                    android:background="@color/list_back"
+                    android:paddingTop="12dp"
                     android:text="Importance:"
                     android:textAlignment="center" />
 
@@ -290,8 +373,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
+                    android:background="@color/list_back"
                     android:checkedButton="@+id/add_radio_low"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingBottom="6dp"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:paddingTop="6dp">
 
                     <RadioButton
                         android:id="@+id/add_radio_low"
@@ -319,8 +407,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
+                    android:background="@color/list_back"
                     android:orientation="horizontal"
-                    android:paddingTop="6dp">
+                    android:paddingBottom="12dp"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp">
 
                     <Button
                         android:id="@+id/btn_item_add"
@@ -337,11 +428,6 @@
                         android:text="Cancel" />
 
                 </LinearLayout>
-
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="60sp"
-                    android:layout_weight="0" />
 
             </LinearLayout>
 

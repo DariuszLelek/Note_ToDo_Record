@@ -7,9 +7,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.omikronsoft.notepad.containers.NoteData;
+import com.omikronsoft.notepad.containers.ItemData;
 import com.omikronsoft.notepad.containers.Priority;
-import com.omikronsoft.notepad.containers.ToDoData;
 import com.omikronsoft.notepad.painting.PaintingResources;
 import com.omikronsoft.notepad.providers.DataProvider;
 
@@ -62,32 +61,16 @@ public class CustomAdapter extends BaseAdapter {
             new ViewHolder(convertView);
         }
         ViewHolder holder = (ViewHolder) convertView.getTag();
-        String item = getItem(position);
-        holder.tv_title.setText(item);
+        ItemData id = DataProvider.getInstance().getItemData(itemType, getItem(position));
 
-        switch (itemType) {
-            case NOTE_ITEM:
-                NoteData nd = DataProvider.getInstance().getNoteData(item);
+        if(id != null) {
+            holder.tv_title.setText(id.getTitle());
+            holder.iv_icon.setImageResource(itemType.getIconResource());
+            holder.tv_datetime.setText(id.getFormattedEditTime());
 
-                if(nd != null){
-                    holder.iv_icon.setImageResource(itemType.getIconResource());
-                    holder.iv_icon.setColorFilter(PaintingResources.getInstance().getListIconPaint(Priority.getPriorityByValue(nd.getPriority())));
-                    holder.tv_datetime.setText(nd.getFormattedEditTime());
-                }
-
-                break;
-            case TODO_ITEM:
-                ToDoData tdd = DataProvider.getInstance().getToDoData(item);
-
-                if(tdd != null){
-                    holder.iv_icon.setImageResource(itemType.getIconResource());
-                    holder.iv_icon.setColorFilter(PaintingResources.getInstance().getListIconPaint(Priority.getPriorityByValue(tdd.getPriority())));
-                    holder.tv_datetime.setText(tdd.getFormattedEditTime());
-                }
-
-                break;
-            case RECORD_ITEM:
-                break;
+            if (itemType.hasPriority()) {
+                holder.iv_icon.setColorFilter(PaintingResources.getInstance().getListIconPaint(Priority.getPriorityByValue(id.getPriority())));
+            }
         }
 
         return convertView;
