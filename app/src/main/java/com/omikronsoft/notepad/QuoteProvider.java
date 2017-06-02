@@ -38,16 +38,19 @@ public class QuoteProvider {
             "Ezra Pound"
     };
 
+    private static final String QUOTE_MARK = "\"";
+    private static final String AUTHOR_MARK = "- ";
+
     public static int getRandomInt(){
         Random rnd = new Random();
         return rnd.nextInt(QUOTES.length - 1);
     }
 
     public static String getQuote(int val){
-        return QUOTES[val];
+        return QUOTE_MARK + QUOTES[val] + QUOTE_MARK;
     }
 
     public static String getAuthor(int val){
-        return AUTHORS[val];
+        return AUTHOR_MARK + AUTHORS[val];
     }
 }

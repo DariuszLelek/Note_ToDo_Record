@@ -241,7 +241,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/list_back"
-        android:visibility="visible">
+        android:visibility="invisible">
 
         <LinearLayout
             android:id="@+id/add_main_back"
@@ -342,7 +342,7 @@
                         android:ems="10"
                         android:gravity="top|left"
                         android:hint="Note"
-                        android:imeOptions="actionDone"
+                        android:imeOptions="normal|actionUnspecified|actionNone|actionGo|actionSend|actionNext|actionDone|actionPrevious|flagNoFullscreen|flagNavigatePrevious|flagNoExtractUi|flagNoAccessoryAction|flagNoEnterAction|flagForceAscii"
                         android:inputType="textMultiLine"
                         android:padding="12dp"
                         android:textSize="24sp"

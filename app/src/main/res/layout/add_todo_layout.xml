@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/item_add_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/list_back"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/add_main_back"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/main_layout"
+            android:orientation="vertical"
+            android:padding="6dp"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txt_todo_dialog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="6dp"
+                    android:text="Add new thing To Do"
+                    android:textAlignment="center"
+                    android:textColor="@color/list_back" />
+
+                <LinearLayout
+                    android:id="@+id/title_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/list_back"
+                    android:orientation="horizontal"
+                    android:padding="6dp">
+
+                    <EditText
+                        android:id="@+id/txt_todo_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:hint="Title"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPersonName"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/black"
+                        android:textSize="24sp" />
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingBottom="6dp"
+                    android:paddingTop="6dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txt_quote"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginLeft="25dp"
+                            android:layout_marginRight="25dp"
+                            android:layout_marginTop="10dp"
+                            android:gravity="bottom|center"
+                            android:textColor="@android:color/darker_gray"
+                            android:textSize="18sp"
+                            android:textStyle="italic" />
+
+                        <TextView
+                            android:id="@+id/txt_author"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:paddingRight="50sp"
+                            android:textAlignment="textEnd"
+                            android:textColor="@android:color/darker_gray"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:background="@color/list_back"
+                android:gravity="top|bottom|center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:background="@color/list_back"
+                    android:paddingTop="12dp"
+                    android:text="Importance:"
+                    android:textAlignment="center" />
+
+                <RadioGroup
+                    android:id="@+id/add_radio_buttons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:background="@color/list_back"
+                    android:checkedButton="@+id/add_item_radio_low"
+                    android:orientation="horizontal"
+                    android:paddingBottom="6dp"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:paddingTop="6dp">
+
+                    <RadioButton
+                        android:id="@+id/add_item_radio_low"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Low" />
+
+                    <RadioButton
+                        android:id="@+id/add_item_radio_med"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Medium" />
+
+                    <RadioButton
+                        android:id="@+id/add_item_radio_high"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="High" />
+                </RadioGroup>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:background="@color/list_back"
+                    android:orientation="horizontal"
+                    android:paddingBottom="12dp"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp">
+
+                    <Button
+                        android:id="@+id/btn_add_todo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Add" />
+
+                    <Button
+                        android:id="@+id/btn_cancel_add_todo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Cancel" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

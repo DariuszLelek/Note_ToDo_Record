@@ -9,6 +9,11 @@
     <string name="total_display_prefix">Total:</string>
     <string name="empty_note_content">This note has only title.</string>
 
+    <string name="add_note_title_new">Add new note</string>
+    <string name="add_note_title_edit">Edit note</string>
+    <string name="add_note_button_edit">OK</string>
+    <string name="add_note_button_add">ADD</string>
+
     <!-- Shared Prefs -->
     <string name="shared_pref_data_separator">,</string>
 
