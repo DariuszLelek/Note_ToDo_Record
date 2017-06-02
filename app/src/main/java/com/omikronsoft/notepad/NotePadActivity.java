@@ -58,8 +58,7 @@ public class NotePadActivity extends AppCompatActivity {
     private TextView totalCounter, notePreviewTextView, quote, author, txtNoteTitle, txtNoteContent, txtNoteDialogTitle, txtToDoTitle;
     private ItemData editedItem;
     private String totalCounterPrefix, counterDisplay;
-    private Dialog noteContentPreview;
-    private Dialog addNoteDialog, addToDoDialog;
+    private Dialog noteContentPreview, addNoteDialog, addToDoDialog, addRecordDialog;
     private Button btnAddNote;
 
     private Globals globals;
@@ -103,6 +102,7 @@ public class NotePadActivity extends AppCompatActivity {
 
         prepareAddNoteDialog();
         prepareAddToDoDialog();
+        prepareAddRecordDialog();
 
         prepareRadioGroup();
         prepareToggleButtons();
@@ -203,6 +203,12 @@ public class NotePadActivity extends AppCompatActivity {
         });
     }
 
+    private void prepareAddRecordDialog(){
+        addRecordDialog = new Dialog(this);
+        addRecordDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        addRecordDialog.setContentView(R.layout.add_record_layout);
+    }
+
     private void hideDialogAndRefreshDisplay(Dialog dialog, ListItemType itemType) {
         dialog.hide();
         updateListAdapter(itemType);
@@ -261,6 +267,7 @@ public class NotePadActivity extends AppCompatActivity {
                         addNoteDialog.show();
                         break;
                     case RECORD_ITEM:
+                        addRecordDialog.show();
                         break;
                     case TODO_ITEM:
                         setDataToDoDialog();

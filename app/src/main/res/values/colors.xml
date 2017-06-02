@@ -26,7 +26,7 @@
     <color name="list_menu_complete_back">#0f9106</color>
     <color name="list_menu_edit_back">#41494e</color>
     <color name="list_icon_low_priority">#000000</color>
-    <color name="list_icon_medium_priority">#e98c00</color>
+    <color name="list_icon_medium_priority">#be7200</color>
     <color name="list_icon_high_priority">#b60804</color>
 
 </resources>
