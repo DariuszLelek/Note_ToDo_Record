@@ -1,9 +1,6 @@
 package com.omikronsoft.notepad.providers;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.media.MediaPlayer;
 
 import com.omikronsoft.notepad.Globals;
 import com.omikronsoft.notepad.ListItemType;
@@ -33,9 +30,6 @@ import static com.omikronsoft.notepad.ListItemType.TODO_ITEM;
 public class DataProvider {
     private static DataProvider instance;
     private Map<ListItemType, Map<String, ItemData>> itemData;
-    private Map<String, String> noteContent;
-    private Map<String, MediaPlayer> recordContent;
-    private Map<String, Bitmap> drawContent;
 
     private String dataSeparator, noteContentPrefix;
     private Globals globals;
@@ -52,14 +46,6 @@ public class DataProvider {
         itemData.put(DRAW_ITEM, new HashMap<String, ItemData>());
 
         loadItemData();
-        //loatContent();
-    }
-
-    // content
-
-
-    public String getNoteContent(String title){
-        return noteContent.get(title);
     }
 
     public int getTotalItems(ListItemType itemType){

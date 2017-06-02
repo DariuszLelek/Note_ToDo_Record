@@ -14,13 +14,10 @@ import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -45,22 +42,25 @@ import static com.omikronsoft.notepad.ListItemType.TODO_ITEM;
 
 public class NotePadActivity extends AppCompatActivity {
     private SwipeMenuListView listView;
-    private RadioButton rbAll, rbMedHigh, rbHigh, addNoteRadioLow, addNoteRadioHigh, addNoteRadioMed, addToDoRadioLow, addToDoRadioMed, addToDoRadioHigh;
+    private RadioButton rbAll;
+    private RadioButton rbMedHigh;
+    private RadioButton addNoteRadioLow;
+    private RadioButton addNoteRadioHigh;
+    private RadioButton addNoteRadioMed;
+    private RadioButton addToDoRadioLow;
+    private RadioButton addToDoRadioMed;
     private FrameLayout progressLayout;
     private Map<ListItemType, ToggleButton> toggleButtonHolder;
     private Map<ListItemType, SwipeMenuCreator> swipeMenuHolder;
     private Map<ListItemType, SwipeMenuListView.OnMenuItemClickListener> menuListenerHolder;
     private Map<ListItemType, CustomAdapter> listAdapters;
-    private FrameLayout addItemLayout;
     private DataProvider dataProvider;
-    private TextView addItemTitle, noteContent, totalCounter, notePreviewTextView, quote, author, txtNoteTitle, txtNoteContent, txtNoteDialogTitle, txtToDoTitle;
-    private LinearLayout mainLayout;
+    private TextView totalCounter, notePreviewTextView, quote, author, txtNoteTitle, txtNoteContent, txtNoteDialogTitle, txtToDoTitle;
     private ItemData editedItem;
     private String totalCounterPrefix, counterDisplay;
     private Dialog noteContentPreview;
-    private ImageView imageAddLayout;
     private Dialog addNoteDialog, addToDoDialog;
-    private Button btnAddNote, btnCancelAddNote, btnAddToDo, btnCancelAddToDo;
+    private Button btnAddNote;
 
     private Globals globals;
     private Context context;
@@ -90,18 +90,7 @@ public class NotePadActivity extends AppCompatActivity {
 
         progressLayout = (FrameLayout)findViewById(R.id.progress_layout);
         progressLayout.setVisibility(View.INVISIBLE);
-        addItemLayout = (FrameLayout)findViewById(R.id.item_add_layout);
-      //  addItemTitle = (TextView)findViewById(R.id.txt_title);
-        noteContent = (TextView)findViewById(R.id.txt_note_content);
-        mainLayout = (LinearLayout)findViewById(R.id.main_layout);
         totalCounter = (TextView)findViewById(R.id.txt_total_counter);
-       // imageAddLayout = (ImageView)findViewById(R.id.image_add_layout);
-
-
-//        loading = new ProgressDialog(this);
-//        loading.setCancelable(true);
-//        loading.setMessage("Loading data...");
-//        loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
         noteContentPreview = new Dialog(this);
         noteContentPreview.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -129,7 +118,7 @@ public class NotePadActivity extends AppCompatActivity {
         txtNoteTitle = (TextView) (addNoteDialog).findViewById(R.id.txt_note_title);
         txtNoteContent =(TextView) (addNoteDialog).findViewById(R.id.txt_note_content);
         btnAddNote = (Button)((addNoteDialog).findViewById(R.id.btn_add_note));
-        btnCancelAddNote = (Button)((addNoteDialog).findViewById(R.id.btn_cancel_add_note));
+        Button btnCancelAddNote = (Button) ((addNoteDialog).findViewById(R.id.btn_cancel_add_note));
 
         addNoteRadioHigh = (RadioButton)((addNoteDialog).findViewById(R.id.add_item_radio_high));
         addNoteRadioMed = (RadioButton)((addNoteDialog).findViewById(R.id.add_item_radio_med));
@@ -181,24 +170,21 @@ public class NotePadActivity extends AppCompatActivity {
         addToDoDialog.setContentView(R.layout.add_todo_layout);
 
         txtToDoTitle = (TextView) (addToDoDialog).findViewById(R.id.txt_todo_title);
-        btnAddToDo = (Button)((addToDoDialog).findViewById(R.id.btn_add_todo));
-        btnCancelAddToDo = (Button)((addToDoDialog).findViewById(R.id.btn_cancel_add_todo));
 
         addToDoRadioLow = (RadioButton)((addToDoDialog).findViewById(R.id.add_item_radio_low));
         addToDoRadioMed = (RadioButton)((addToDoDialog).findViewById(R.id.add_item_radio_med));
-        addToDoRadioHigh = (RadioButton)((addToDoDialog).findViewById(R.id.add_item_radio_high));
 
         quote = (TextView) (addToDoDialog).findViewById(R.id.txt_quote);
         author = (TextView) (addToDoDialog).findViewById(R.id.txt_author);
 
-        btnCancelAddToDo.setOnClickListener(new View.OnClickListener() {
+        (addToDoDialog).findViewById(R.id.btn_cancel_add_todo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addToDoDialog.hide();
             }
         });
 
-        btnAddToDo.setOnClickListener(new View.OnClickListener() {
+        (addToDoDialog).findViewById(R.id.btn_add_todo).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -490,7 +476,6 @@ public class NotePadActivity extends AppCompatActivity {
         final RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio_group);
         rbAll = (RadioButton) findViewById(R.id.radio_low);
         rbMedHigh = (RadioButton) findViewById(R.id.radio_med);
-        rbHigh = (RadioButton) findViewById(R.id.radio_high);
 
         switch (globals.getSelectedPriority()){
             case LOW:
@@ -500,7 +485,7 @@ public class NotePadActivity extends AppCompatActivity {
                 rbMedHigh.setChecked(true);
                 break;
             case HIGH:
-                rbHigh.setChecked(true);
+                ((RadioButton) findViewById(R.id.radio_high)).setChecked(true);
                 break;
             default:
                 break;
