@@ -24,6 +24,25 @@ public class Utils {
         return sb.toString();
     }
 
+    public String getUpdatedTimer(String timer){
+        String[] timerParts = timer.split(":");
+        int minutes = Integer.parseInt(timerParts[0]);
+        int seconds = Integer.parseInt(timerParts[1]);
+
+        seconds ++;
+        if(seconds == 60){
+            seconds = 0;
+            minutes++;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(minutes < 10 ? "0" + String.valueOf(minutes) : String.valueOf(minutes));
+        sb.append(":");
+        sb.append(seconds < 10 ? "0" + String.valueOf(seconds) : String.valueOf(seconds));
+
+        return sb.toString();
+    }
+
     private Utils(){
 
     }

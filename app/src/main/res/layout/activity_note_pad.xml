@@ -133,6 +133,7 @@
                         android:paddingRight="2sp"
                         android:paddingTop="2dp"
                         android:text="Total:"
+                        android:textAlignment="center"
                         android:textColor="@color/toggle_radio_back"
                         android:textSize="14sp" />
                 </FrameLayout>

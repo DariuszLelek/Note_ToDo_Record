@@ -18,6 +18,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -31,6 +33,8 @@ import com.omikronsoft.notepad.containers.Content;
 import com.omikronsoft.notepad.containers.ItemData;
 import com.omikronsoft.notepad.containers.Priority;
 import com.omikronsoft.notepad.providers.DataProvider;
+import com.omikronsoft.notepad.utils.RecordingHelper;
+import com.omikronsoft.notepad.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,11 +59,13 @@ public class NotePadActivity extends AppCompatActivity {
     private Map<ListItemType, SwipeMenuListView.OnMenuItemClickListener> menuListenerHolder;
     private Map<ListItemType, CustomAdapter> listAdapters;
     private DataProvider dataProvider;
-    private TextView totalCounter, notePreviewTextView, quote, author, txtNoteTitle, txtNoteContent, txtNoteDialogTitle, txtToDoTitle;
+    private TextView totalCounter, notePreviewTextView, quote, author, txtNoteTitle, txtNoteContent, txtNoteDialogTitle, txtToDoTitle, recTimer;
     private ItemData editedItem;
     private String totalCounterPrefix, counterDisplay;
     private Dialog noteContentPreview, addNoteDialog, addToDoDialog, addRecordDialog;
     private Button btnAddNote;
+    private boolean updateTimerThreadRuuning;
+    private ImageButton playRec, stopRec, delRec;
 
     private Globals globals;
     private Context context;
@@ -207,6 +213,82 @@ public class NotePadActivity extends AppCompatActivity {
         addRecordDialog = new Dialog(this);
         addRecordDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         addRecordDialog.setContentView(R.layout.add_record_layout);
+
+        recTimer = (TextView)(addRecordDialog).findViewById(R.id.txt_record_time);
+
+        final ImageView recImage = (ImageView)(addRecordDialog).findViewById(R.id.image_mic);
+        playRec = (ImageButton)(addRecordDialog).findViewById(R.id.btn_play_rec);
+        stopRec = (ImageButton)(addRecordDialog).findViewById(R.id.btn_stop_rec);
+        delRec = (ImageButton)(addRecordDialog).findViewById(R.id.btn_delete_rec);
+
+        recImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(RecordingHelper.getInstance().isRecording()){
+                    RecordingHelper.getInstance().stopRecording();
+                    recImage.setColorFilter(Color.WHITE);
+
+                    setDataRecordDialog(true);
+                }else{
+                    RecordingHelper.getInstance().startRecording();
+                    recImage.setColorFilter(Color.RED);
+                    recTimer.setText("00:00");
+                    startUpdateTimerThread();
+                    setDataRecordDialog(false);
+                }
+            }
+        });
+
+        playRec.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RecordingHelper.getInstance().playFile();
+            }
+        });
+
+        stopRec.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RecordingHelper.getInstance().stopFile();
+            }
+        });
+
+        delRec.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // todo process delete
+                setDataRecordDialog(false);
+                recTimer.setText("00:00");
+                RecordingHelper.getInstance().deleteFile();
+            }
+        });
+    }
+
+    private void startUpdateTimerThread(){
+        if(!updateTimerThreadRuuning){
+            Thread timerThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (RecordingHelper.getInstance().isRecording()) {
+                        try {
+                            Thread.sleep(1000);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    recTimer.setText(Utils.getInstance().getUpdatedTimer(recTimer.getText().toString()));
+                                }
+                            });
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    updateTimerThreadRuuning = false;
+                }
+            });
+            timerThread.start();
+            updateTimerThreadRuuning = true;
+        }
     }
 
     private void hideDialogAndRefreshDisplay(Dialog dialog, ListItemType itemType) {
@@ -221,6 +303,12 @@ public class NotePadActivity extends AppCompatActivity {
 
         txtToDoTitle.setText("");
         addToDoRadioLow.setChecked(true);
+    }
+
+    private void setDataRecordDialog(boolean enabled){
+        playRec.setEnabled(enabled);
+        stopRec.setEnabled(enabled);
+        delRec.setEnabled(enabled);
     }
 
     private void setDataNoteDialog(ItemData itemData){
@@ -267,6 +355,7 @@ public class NotePadActivity extends AppCompatActivity {
                         addNoteDialog.show();
                         break;
                     case RECORD_ITEM:
+                        setDataRecordDialog(false);
                         addRecordDialog.show();
                         break;
                     case TODO_ITEM:

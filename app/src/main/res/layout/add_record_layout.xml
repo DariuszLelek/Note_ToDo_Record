@@ -16,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/main_layout"
+            android:gravity="center"
             android:orientation="vertical"
             android:padding="6dp"
             android:weightSum="1">
@@ -62,15 +63,95 @@
 
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/imageView"
+            <TextView
+                android:id="@+id/textView"
                 android:layout_width="match_parent"
-                android:layout_height="200sp"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
                 android:layout_weight="0"
-                app:srcCompat="@mipmap/ic_record_big" />
+                android:text="Tap mic to start recording"
+                android:textAlignment="center"
+                android:textColor="@color/list_back"
+                android:textSize="12sp" />
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/image_mic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:adjustViewBounds="true"
+                        android:clickable="true"
+                        android:cropToPadding="false"
+                        android:scaleType="fitXY"
+                        android:tint="@color/list_back"
+                        app:srcCompat="@drawable/ic_mic_black_24dp" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right">
+
+                    <TextView
+                        android:id="@+id/txt_record_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00:00"
+                        android:textAlignment="center"
+                        android:textColor="@color/list_back"
+                        android:textSize="12sp" />
+                </FrameLayout>
+
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
+                android:layout_height="80sp"
+                android:layout_weight="0"
+                android:orientation="horizontal"
+                android:padding="6dp">
+
+                <ImageButton
+                    android:id="@+id/btn_play_rec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="5dp"
+                    android:scaleType="fitXY"
+                    android:tint="@color/main_layout"
+                    app:srcCompat="@drawable/ic_play_arrow_black_24dp" />
+
+                <ImageButton
+                    android:id="@+id/btn_stop_rec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:scaleType="fitXY"
+                    android:tint="@color/main_layout"
+                    app:srcCompat="@drawable/ic_stop_black_24dp" />
+
+                <ImageButton
+                    android:id="@+id/btn_delete_rec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:scaleType="fitXY"
+                    android:tint="@color/main_layout"
+                    app:srcCompat="@drawable/ic_clear_black_24dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="0"
                 android:background="@color/list_back"
@@ -89,9 +170,9 @@
 
                 <RadioGroup
                     android:id="@+id/add_radio_buttons"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0"
+                    android:layout_weight="1"
                     android:background="@color/list_back"
                     android:checkedButton="@+id/add_item_radio_low"
                     android:orientation="horizontal"
@@ -104,21 +185,24 @@
                         android:id="@+id/add_item_radio_low"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0"
+                        android:maxLines="1"
                         android:text="Low" />
 
                     <RadioButton
                         android:id="@+id/add_item_radio_med"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0"
+                        android:maxLines="1"
                         android:text="Medium" />
 
                     <RadioButton
                         android:id="@+id/add_item_radio_high"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0"
+                        android:maxLines="1"
                         android:text="High" />
                 </RadioGroup>
 
