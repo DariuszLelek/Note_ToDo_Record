@@ -123,10 +123,8 @@ public class RecordingHelper {
         recorder.release();
         recorder = null;
 
-        if(pendingMediaPlayer == null){
-            Uri url = Uri.parse(pendingRecordFile.getAbsolutePath());
-            pendingMediaPlayer = MediaPlayer.create(ApplicationContext.get(), url);
-        }
+        Uri url = Uri.parse(pendingRecordFile.getAbsolutePath());
+        pendingMediaPlayer = MediaPlayer.create(ApplicationContext.get(), url);
     }
 
     public synchronized static RecordingHelper getInstance() {

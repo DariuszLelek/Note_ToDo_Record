@@ -67,10 +67,7 @@ public class CustomAdapter extends BaseAdapter {
             holder.tv_title.setText(id.getTitle());
             holder.iv_icon.setImageResource(itemType.getIconResource());
             holder.tv_datetime.setText(id.getFormattedEditTime());
-
-            if (itemType.hasPriority()) {
-                holder.iv_icon.setColorFilter(PaintingResources.getInstance().getListIconPaint(Priority.getPriorityByValue(id.getPriority())));
-            }
+            holder.iv_icon.setColorFilter(PaintingResources.getInstance().getListIconPaint(Priority.getPriorityByValue(id.getPriority())));
         }
 
         return convertView;

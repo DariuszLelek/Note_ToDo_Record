@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.omikronsoft.notepad.ListItemType.DRAW_ITEM;
 import static com.omikronsoft.notepad.ListItemType.NOTE_ITEM;
 import static com.omikronsoft.notepad.ListItemType.RECORD_ITEM;
 import static com.omikronsoft.notepad.ListItemType.TODO_ITEM;
@@ -48,7 +47,6 @@ public class DataProvider {
         itemData.put(NOTE_ITEM, new HashMap<String, ItemData>());
         itemData.put(TODO_ITEM, new HashMap<String, ItemData>());
         itemData.put(RECORD_ITEM, new HashMap<String, ItemData>());
-        itemData.put(DRAW_ITEM, new HashMap<String, ItemData>());
 
         loadItemData();
     }
@@ -85,7 +83,7 @@ public class DataProvider {
 
     public List<String> getTitleListByPriority(ListItemType itemType){
         List<String> result = new ArrayList<>();
-        int selectedPriority = itemType.hasPriority() ? Globals.getInstance().getSelectedPriority().getValue() : Priority.LOW.getValue();
+        int selectedPriority = Globals.getInstance().getSelectedPriority().getValue();
 
         for(Map.Entry<String, ItemData> pair : itemData.get(itemType).entrySet()){
             if(pair.getValue().getPriority() >= selectedPriority){
@@ -153,8 +151,6 @@ public class DataProvider {
             case NOTE_ITEM:
                 edit.putString(noteContentPrefix+id.getTitle(), id.getContent().getNoteContent());
                 break;
-            case DRAW_ITEM:
-                break;
             case RECORD_ITEM:
                 // files are saved at record time when dialog is displayed
                 break;
@@ -182,8 +178,6 @@ public class DataProvider {
                         content.setRecordContent(media);
                     }
                 }
-                break;
-            case DRAW_ITEM:
                 break;
             default:
             case TODO_ITEM:

@@ -77,7 +77,8 @@
             <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0">
+                android:layout_weight="0"
+                android:paddingBottom="6sp">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -112,44 +113,6 @@
                 </FrameLayout>
 
             </FrameLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="80sp"
-                android:layout_weight="0"
-                android:orientation="horizontal"
-                android:padding="6dp"
-                android:visibility="invisible">
-
-                <ImageButton
-                    android:id="@+id/btn_play_rec"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:elevation="5dp"
-                    android:scaleType="fitXY"
-                    android:tint="@color/main_layout"
-                    app:srcCompat="@drawable/ic_play_arrow_black_24dp" />
-
-                <ImageButton
-                    android:id="@+id/btn_stop_rec"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:scaleType="fitXY"
-                    android:tint="@color/main_layout"
-                    app:srcCompat="@drawable/ic_stop_black_24dp" />
-
-                <ImageButton
-                    android:id="@+id/btn_delete_rec"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:scaleType="fitXY"
-                    android:tint="@color/main_layout"
-                    app:srcCompat="@drawable/ic_clear_black_24dp" />
-
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"

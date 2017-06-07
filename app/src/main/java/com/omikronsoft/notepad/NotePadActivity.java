@@ -2,6 +2,7 @@ package com.omikronsoft.notepad;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -225,29 +226,6 @@ public class NotePadActivity extends AppCompatActivity {
         final RadioButton addRecRadioMed = (RadioButton)((addRecordDialog).findViewById(R.id.add_item_radio_med));
 
         final ImageView recImage = (ImageView)(addRecordDialog).findViewById(R.id.image_mic);
-        playRec = (ImageButton)(addRecordDialog).findViewById(R.id.btn_play_rec);
-        stopRec = (ImageButton)(addRecordDialog).findViewById(R.id.btn_stop_rec);
-        delRec = (ImageButton)(addRecordDialog).findViewById(R.id.btn_delete_rec);
-//
-//        recImage.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//
-//
-//                if(RecordingHelper.getInstance().isRecording()){
-//                    recImage.setColorFilter(Color.WHITE);
-//                    setDataRecordButtons(true);
-//                    RecordingHelper.getInstance().stopRecording();
-//                }else{
-//                    recImage.setColorFilter(Color.RED);
-//                    recTimer.setText(res.getString(R.string.record_timer_zero_time));
-//                    startUpdateTimerThread();
-//                    setDataRecordButtons(false);
-//                    RecordingHelper.getInstance().startRecording();
-//                }
-//            }
-//        });
 
         recImage.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -255,41 +233,15 @@ public class NotePadActivity extends AppCompatActivity {
                 if(event.getAction() == MotionEvent.ACTION_DOWN){
                     if(RecordingHelper.getInstance().isRecording()){
                         recImage.setColorFilter(Color.WHITE);
-                        setDataRecordButtons(true);
                         RecordingHelper.getInstance().stopRecording();
                     }else{
                         recImage.setColorFilter(Color.RED);
                         recTimer.setText(res.getString(R.string.record_timer_zero_time));
                         startUpdateTimerThread();
-                        setDataRecordButtons(false);
                         RecordingHelper.getInstance().startRecording();
                     }
                 }
                 return false;
-            }
-        });
-
-        playRec.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //RecordingHelper.getInstance().playPendingFile();
-            }
-        });
-
-        stopRec.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                RecordingHelper.getInstance().stopFile();
-            }
-        });
-
-        delRec.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // todo process delete
-                setDataRecordButtons(false);
-                recTimer.setText(res.getString(R.string.record_timer_zero_time));
-                RecordingHelper.getInstance().deleteFile();
             }
         });
 
@@ -325,6 +277,16 @@ public class NotePadActivity extends AppCompatActivity {
                         DataProvider.getInstance().addItemData(id);
                         hideDialogAndRefreshDisplay(addRecordDialog, RECORD_ITEM);
                     }
+                }
+            }
+        });
+
+        addRecordDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if(RecordingHelper.getInstance().isRecording()){
+                    recImage.setColorFilter(Color.WHITE);
+                    RecordingHelper.getInstance().stopRecording();
                 }
             }
         });
@@ -372,19 +334,12 @@ public class NotePadActivity extends AppCompatActivity {
     }
 
     private void clearDataRecordDialog(){
-        setDataRecordButtons(false);
         recTimer.setText(res.getString(R.string.record_timer_zero_time));
 
         ((RadioButton)((addRecordDialog).findViewById(R.id.add_item_radio_low))).setChecked(true);
 
         RecordingHelper.getInstance().prepareRecordFile();
         txtRecordDialogTitle.setText(RecordingHelper.getInstance().getRecordFileName());
-    }
-
-    private void setDataRecordButtons(boolean enabled){
-        playRec.setEnabled(enabled);
-        stopRec.setEnabled(enabled);
-        delRec.setEnabled(enabled);
     }
 
     private void setDataNoteDialog(ItemData itemData){
@@ -424,9 +379,6 @@ public class NotePadActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 switch (globals.getSelectedListType()){
-                    case DRAW_ITEM:
-                        // todo
-                        break;
                     case NOTE_ITEM:
                         setDataNoteDialog(null);
                         addNoteDialog.show();
@@ -500,26 +452,9 @@ public class NotePadActivity extends AppCompatActivity {
             }
         };
 
-
-//        SwipeMenuListView.OnMenuItemClickListener drawClickListener = new SwipeMenuListView.OnMenuItemClickListener(){
-//            @Override
-//            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-//                String title = listAdapters.get(DRAW_ITEM).getItem(position);
-//
-//                switch (index){
-//                    case 0:
-//                        DataProvider.getInstance().deleteItem(DRAW_ITEM, title);
-//                        updateListAdapter(DRAW_ITEM);
-//                        break;
-//                }
-//                return false;
-//            }
-//        };
-
         menuListenerHolder.put(NOTE_ITEM, noteClickListener);
         menuListenerHolder.put(TODO_ITEM, todoClickListener);
         menuListenerHolder.put(RECORD_ITEM, recordClickListener);
-        //menuListenerHolder.put(DRAW_ITEM, drawClickListener);
     }
 
     private void prepareSwipeMenus(){
@@ -636,7 +571,6 @@ public class NotePadActivity extends AppCompatActivity {
         toggleButtonHolder.put(ListItemType.NOTE_ITEM, (ToggleButton) findViewById(R.id.toggle_notes));
         toggleButtonHolder.put(TODO_ITEM,  (ToggleButton) findViewById(R.id.toggle_todo));
         toggleButtonHolder.put(RECORD_ITEM, (ToggleButton) findViewById(R.id.toggle_records));
-        //toggleButtonHolder.put(DRAW_ITEM, (ToggleButton) findViewById(R.id.toggle_draw));
 
         for(ToggleButton toggleButton : toggleButtonHolder.values()){
             toggleButton.setOnCheckedChangeListener(ToggleListener);
@@ -708,45 +642,30 @@ public class NotePadActivity extends AppCompatActivity {
         listAdapters.put(NOTE_ITEM, new CustomAdapter(dataProvider.getTitleListByPriority(NOTE_ITEM), context, NOTE_ITEM));
         listAdapters.put(TODO_ITEM, new CustomAdapter(dataProvider.getTitleListByPriority(TODO_ITEM), context, TODO_ITEM));
         listAdapters.put(RECORD_ITEM, new CustomAdapter(dataProvider.getTitleListByPriority(RECORD_ITEM), context, RECORD_ITEM));
-        //listAdapters.put(DRAW_ITEM, new CustomAdapter(dataProvider.getTitleListByPriority(DRAW_ITEM), context, DRAW_ITEM));
 
         listView.setAdapter(listAdapters.get(globals.getSelectedListType()));
         listView.setSwipeDirection(SwipeMenuListView.DIRECTION_RIGHT);
         listView.setLongClickable(true);
 
-        listView.setOnTouchListener(new View.OnTouchListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                ListItemType itemType = globals.getSelectedListType();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(globals.getSelectedListType() == RECORD_ITEM){
+                    String title = (String)listView.getItemAtPosition(position);
+                    ItemData itemData = DataProvider.getInstance().getItemData(RECORD_ITEM, title);
 
-                if(itemType == RECORD_ITEM){
-                    switch(event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            int position = listView.pointToPosition((int)event.getX(), (int)event.getY());
-                            String title = (String)listView.getItemAtPosition(position);
-
-                            ItemData itemData = DataProvider.getInstance().getItemData(RECORD_ITEM, title);
-
-                            if(itemData != null && itemData.getContent() != null){
-                                MediaPlayer media = itemData.getContent().getRecordContent();
-                                if(media != null){
-                                    AudioPlayer.getInstance().playWithOffset(media, 0);
-                                }
-                            }
-
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            int position2 = listView.pointToPosition((int)event.getX(), (int)event.getY());
-                            String title2 = (String)listView.getItemAtPosition(position2);
-
-                            if(itemType == RECORD_ITEM){
+                    if(itemData != null && itemData.getContent() != null) {
+                        MediaPlayer media = itemData.getContent().getRecordContent();
+                        if (media != null) {
+                            if(media.isPlaying()){
+                                AudioPlayer.getInstance().stopMedia(media);
+                            }else{
                                 AudioPlayer.getInstance().stopAll();
+                                AudioPlayer.getInstance().playWithOffset(media, 0);
                             }
-                            break;
+                        }
                     }
                 }
-
-                return false;
             }
         });
 
