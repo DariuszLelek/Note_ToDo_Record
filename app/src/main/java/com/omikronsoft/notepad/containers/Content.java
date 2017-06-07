@@ -1,6 +1,5 @@
 package com.omikronsoft.notepad.containers;
 
-import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 
 /**
@@ -11,9 +10,9 @@ import android.media.MediaPlayer;
 public class Content {
     private String noteContent;
     private MediaPlayer recordContent;
-    private Bitmap drawContent;
 
     public Content() {
+
     }
 
     public String getNoteContent() {
@@ -30,13 +29,5 @@ public class Content {
 
     public void setRecordContent(MediaPlayer recordContent) {
         this.recordContent = recordContent;
-    }
-
-    public Bitmap getDrawContent() {
-        return drawContent;
-    }
-
-    public void setDrawContent(Bitmap drawContent) {
-        this.drawContent = drawContent;
     }
 }

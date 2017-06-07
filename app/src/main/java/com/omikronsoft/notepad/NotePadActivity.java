@@ -21,7 +21,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -36,45 +35,46 @@ import com.omikronsoft.notepad.containers.Content;
 import com.omikronsoft.notepad.containers.ItemData;
 import com.omikronsoft.notepad.containers.Priority;
 import com.omikronsoft.notepad.providers.DataProvider;
+import com.omikronsoft.notepad.utils.ApplicationContext;
 import com.omikronsoft.notepad.utils.AudioPlayer;
+import com.omikronsoft.notepad.utils.CustomAdapter;
+import com.omikronsoft.notepad.utils.Globals;
+import com.omikronsoft.notepad.utils.ListItemType;
+import com.omikronsoft.notepad.utils.QuoteProvider;
 import com.omikronsoft.notepad.utils.RecordingHelper;
 import com.omikronsoft.notepad.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import static android.R.id.list;
-import static com.omikronsoft.notepad.ListItemType.NOTE_ITEM;
-import static com.omikronsoft.notepad.ListItemType.RECORD_ITEM;
-import static com.omikronsoft.notepad.ListItemType.TODO_ITEM;
+import static com.omikronsoft.notepad.utils.ListItemType.NOTE_ITEM;
+import static com.omikronsoft.notepad.utils.ListItemType.RECORD_ITEM;
+import static com.omikronsoft.notepad.utils.ListItemType.TODO_ITEM;
 
 public class NotePadActivity extends AppCompatActivity {
     private SwipeMenuListView listView;
-    private RadioButton rbAll;
-    private RadioButton rbMedHigh;
-    private RadioButton addNoteRadioLow;
-    private RadioButton addNoteRadioHigh;
-    private RadioButton addNoteRadioMed;
-    private RadioButton addToDoRadioLow;
-    private RadioButton addToDoRadioMed;
+    private RadioButton rbAll, rbMedHigh, addNoteRadioLow;
+    private RadioButton addNoteRadioHigh, addNoteRadioMed, addToDoRadioLow, addToDoRadioMed;
     private FrameLayout progressLayout;
     private Map<ListItemType, ToggleButton> toggleButtonHolder;
     private Map<ListItemType, SwipeMenuCreator> swipeMenuHolder;
     private Map<ListItemType, SwipeMenuListView.OnMenuItemClickListener> menuListenerHolder;
     private Map<ListItemType, CustomAdapter> listAdapters;
     private DataProvider dataProvider;
-    private TextView totalCounter, notePreviewTextView, quote, author, txtNoteTitle, txtNoteContent, txtNoteDialogTitle, txtRecordDialogTitle, txtToDoDialogTitle, recTimer;
+    private TextView totalCounter, notePreviewTextView, quote, author, txtNoteTitle, txtNoteContent;
+    private TextView txtNoteDialogTitle, txtRecordDialogTitle, txtToDoDialogTitle, recTimer;
     private ItemData editedItem;
+    private ImageView recImage;
     private String totalCounterPrefix, counterDisplay;
     private Dialog noteContentPreview, addNoteDialog, addToDoDialog, addRecordDialog;
     private Button btnAddNote;
-    private boolean updateTimerThreadRuuning;
-    private ImageButton playRec, stopRec, delRec;
+    private boolean updateTimerThreadRunning;
 
     private Globals globals;
     private Context context;
     private Resources res;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,9 +98,9 @@ public class NotePadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_note_pad);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        progressLayout = (FrameLayout)findViewById(R.id.progress_layout);
+        progressLayout = (FrameLayout) findViewById(R.id.progress_layout);
         progressLayout.setVisibility(View.INVISIBLE);
-        totalCounter = (TextView)findViewById(R.id.txt_total_counter);
+        totalCounter = (TextView) findViewById(R.id.txt_total_counter);
 
         noteContentPreview = new Dialog(this);
         noteContentPreview.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -120,20 +120,20 @@ public class NotePadActivity extends AppCompatActivity {
         prepareFloatingActionButton();
     }
 
-    private void prepareAddNoteDialog(){
+    private void prepareAddNoteDialog() {
         addNoteDialog = new Dialog(this);
         addNoteDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         addNoteDialog.setContentView(R.layout.add_note_layout);
 
         txtNoteDialogTitle = (TextView) (addNoteDialog).findViewById(R.id.txt_note_dialog);
         txtNoteTitle = (TextView) (addNoteDialog).findViewById(R.id.txt_note_title);
-        txtNoteContent =(TextView) (addNoteDialog).findViewById(R.id.txt_note_content);
-        btnAddNote = (Button)((addNoteDialog).findViewById(R.id.btn_add_note));
+        txtNoteContent = (TextView) (addNoteDialog).findViewById(R.id.txt_note_content);
+        btnAddNote = (Button) ((addNoteDialog).findViewById(R.id.btn_add_note));
         Button btnCancelAddNote = (Button) ((addNoteDialog).findViewById(R.id.btn_cancel_add_note));
 
-        addNoteRadioHigh = (RadioButton)((addNoteDialog).findViewById(R.id.add_item_radio_high));
-        addNoteRadioMed = (RadioButton)((addNoteDialog).findViewById(R.id.add_item_radio_med));
-        addNoteRadioLow = (RadioButton)((addNoteDialog).findViewById(R.id.add_item_radio_low));
+        addNoteRadioHigh = (RadioButton) ((addNoteDialog).findViewById(R.id.add_item_radio_high));
+        addNoteRadioMed = (RadioButton) ((addNoteDialog).findViewById(R.id.add_item_radio_med));
+        addNoteRadioLow = (RadioButton) ((addNoteDialog).findViewById(R.id.add_item_radio_low));
 
         btnCancelAddNote.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,17 +151,20 @@ public class NotePadActivity extends AppCompatActivity {
                 int priority = addNoteRadioLow.isChecked() ? 0 : (addNoteRadioMed.isChecked() ? 1 : 2);
 
                 if (!title.isEmpty()) {
-                    if(editedItem != null){
+                    if (editedItem != null) {
                         String oldTitle = editedItem.getTitle();
-                        editedItem.setPriority(priority);
-                        editedItem.setTitle(txtNoteTitle.getText().toString());
-                        editedItem.setEditTime(System.currentTimeMillis());
-                        editedItem.getContent().setNoteContent(txtNoteContent.getText().toString());
-                        DataProvider.getInstance().updateItemData(oldTitle, editedItem);
-                        editedItem = null;
-                        hideDialogAndRefreshDisplay(addNoteDialog, NOTE_ITEM);
-                    }else{
-                        if(!DataProvider.getInstance().itemExists(title, NOTE_ITEM)){
+                        if ((!oldTitle.equals(title) && !DataProvider.getInstance().itemExists(title, NOTE_ITEM))
+                                || oldTitle.equals(title)) {
+                            editedItem.setPriority(priority);
+                            editedItem.setTitle(title);
+                            editedItem.setEditTime(System.currentTimeMillis());
+                            editedItem.getContent().setNoteContent(txtNoteContent.getText().toString());
+                            DataProvider.getInstance().updateItemData(oldTitle, editedItem);
+                            editedItem = null;
+                            hideDialogAndRefreshDisplay(addNoteDialog, NOTE_ITEM);
+                        }
+                    } else {
+                        if (!DataProvider.getInstance().itemExists(title, NOTE_ITEM)) {
                             ItemData id = new ItemData(NOTE_ITEM, title, priority, System.currentTimeMillis());
                             Content content = new Content();
                             content.setNoteContent(txtNoteContent.getText().toString());
@@ -175,15 +178,15 @@ public class NotePadActivity extends AppCompatActivity {
         });
     }
 
-    private void prepareAddToDoDialog(){
+    private void prepareAddToDoDialog() {
         addToDoDialog = new Dialog(this);
         addToDoDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         addToDoDialog.setContentView(R.layout.add_todo_layout);
 
         txtToDoDialogTitle = (TextView) (addToDoDialog).findViewById(R.id.txt_todo_title);
 
-        addToDoRadioLow = (RadioButton)((addToDoDialog).findViewById(R.id.add_item_radio_low));
-        addToDoRadioMed = (RadioButton)((addToDoDialog).findViewById(R.id.add_item_radio_med));
+        addToDoRadioLow = (RadioButton) ((addToDoDialog).findViewById(R.id.add_item_radio_low));
+        addToDoRadioMed = (RadioButton) ((addToDoDialog).findViewById(R.id.add_item_radio_med));
 
         quote = (TextView) (addToDoDialog).findViewById(R.id.txt_quote);
         author = (TextView) (addToDoDialog).findViewById(R.id.txt_author);
@@ -214,27 +217,27 @@ public class NotePadActivity extends AppCompatActivity {
         });
     }
 
-    private void prepareAddRecordDialog(){
+    private void prepareAddRecordDialog() {
         addRecordDialog = new Dialog(this);
         addRecordDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         addRecordDialog.setContentView(R.layout.add_record_layout);
 
-        recTimer = (TextView)(addRecordDialog).findViewById(R.id.txt_record_time);
-        txtRecordDialogTitle = (TextView)(addRecordDialog).findViewById(R.id.txt_record_title);
+        recTimer = (TextView) (addRecordDialog).findViewById(R.id.txt_record_time);
+        txtRecordDialogTitle = (TextView) (addRecordDialog).findViewById(R.id.txt_record_title);
 
-        final RadioButton addRecRadioLow = (RadioButton)((addRecordDialog).findViewById(R.id.add_item_radio_low));
-        final RadioButton addRecRadioMed = (RadioButton)((addRecordDialog).findViewById(R.id.add_item_radio_med));
+        final RadioButton addRecRadioLow = (RadioButton) ((addRecordDialog).findViewById(R.id.add_item_radio_low));
+        final RadioButton addRecRadioMed = (RadioButton) ((addRecordDialog).findViewById(R.id.add_item_radio_med));
 
-        final ImageView recImage = (ImageView)(addRecordDialog).findViewById(R.id.image_mic);
+        recImage = (ImageView) (addRecordDialog).findViewById(R.id.image_mic);
 
         recImage.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    if(RecordingHelper.getInstance().isRecording()){
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (RecordingHelper.getInstance().isRecording()) {
                         recImage.setColorFilter(Color.WHITE);
                         RecordingHelper.getInstance().stopRecording();
-                    }else{
+                    } else {
                         recImage.setColorFilter(Color.RED);
                         recTimer.setText(res.getString(R.string.record_timer_zero_time));
                         startUpdateTimerThread();
@@ -248,6 +251,7 @@ public class NotePadActivity extends AppCompatActivity {
         (addRecordDialog).findViewById(R.id.btn_cancel_add_rec).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                clearRecordDialogData();
                 addRecordDialog.hide();
             }
         });
@@ -263,10 +267,9 @@ public class NotePadActivity extends AppCompatActivity {
                     if (!DataProvider.getInstance().itemExists(title, RECORD_ITEM)
                             && !RecordingHelper.getInstance().isRecordEmpty()
                             && !RecordingHelper.getInstance().isRecording()) {
-                        if(title.equals(RecordingHelper.getInstance().getRecordFileName())){
+                        if (title.equals(RecordingHelper.getInstance().getRecordFileName())) {
                             Globals.getInstance().incrementPendingRecFileNum();
-                        }else{
-                            // todo change pending file name
+                        } else {
                             RecordingHelper.getInstance().changePendingFileName(title);
                         }
 
@@ -284,38 +287,36 @@ public class NotePadActivity extends AppCompatActivity {
         addRecordDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                if(RecordingHelper.getInstance().isRecording()){
-                    recImage.setColorFilter(Color.WHITE);
-                    RecordingHelper.getInstance().stopRecording();
-                }
+                clearRecordDialogData();
             }
         });
     }
 
-    private void startUpdateTimerThread(){
-        if(!updateTimerThreadRuuning){
+    private void startUpdateTimerThread() {
+        if (!updateTimerThreadRunning) {
             Thread timerThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     while (RecordingHelper.getInstance().isRecording()) {
                         try {
-                            Thread.sleep(1000);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     recTimer.setText(Utils.getInstance().getUpdatedTimer(recTimer.getText().toString()));
                                 }
                             });
-
+                            Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
-                    updateTimerThreadRuuning = false;
+                    updateTimerThreadRunning = false;
                 }
             });
-            timerThread.start();
-            updateTimerThreadRuuning = true;
+
+            final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+            executor.schedule(timerThread, 1, TimeUnit.SECONDS);
+            updateTimerThreadRunning = true;
         }
     }
 
@@ -324,7 +325,7 @@ public class NotePadActivity extends AppCompatActivity {
         updateListAdapter(itemType);
     }
 
-    private void clearDataToDoDialog(){
+    private void clearDataToDoDialog() {
         int rnd = QuoteProvider.getRandomInt();
         quote.setText(QuoteProvider.getQuote(rnd));
         author.setText(QuoteProvider.getAuthor(rnd));
@@ -333,21 +334,22 @@ public class NotePadActivity extends AppCompatActivity {
         addToDoRadioLow.setChecked(true);
     }
 
-    private void clearDataRecordDialog(){
+    private void clearRecordDialogData() {
         recTimer.setText(res.getString(R.string.record_timer_zero_time));
+        ((RadioButton) ((addRecordDialog).findViewById(R.id.add_item_radio_low))).setChecked(true);
 
-        ((RadioButton)((addRecordDialog).findViewById(R.id.add_item_radio_low))).setChecked(true);
-
-        RecordingHelper.getInstance().prepareRecordFile();
-        txtRecordDialogTitle.setText(RecordingHelper.getInstance().getRecordFileName());
+        if (RecordingHelper.getInstance().isRecording()) {
+            recImage.setColorFilter(Color.WHITE);
+            RecordingHelper.getInstance().stopRecording();
+        }
     }
 
-    private void setDataNoteDialog(ItemData itemData){
-        if(itemData != null){
+    private void setDataNoteDialog(ItemData itemData) {
+        if (itemData != null) {
             txtNoteDialogTitle.setText(res.getString(R.string.add_note_title_edit));
             btnAddNote.setText(res.getString(R.string.add_note_button_edit));
 
-            switch (itemData.getPriority()){
+            switch (itemData.getPriority()) {
                 case 0:
                     addNoteRadioLow.setChecked(true);
                     break;
@@ -362,29 +364,30 @@ public class NotePadActivity extends AppCompatActivity {
             }
             txtNoteTitle.setText(itemData.getTitle());
             txtNoteContent.setText(itemData.getContent().getNoteContent());
-        }else{
+        } else {
             txtNoteDialogTitle.setText(res.getString(R.string.add_note_title_new));
             btnAddNote.setText(res.getString(R.string.add_note_button_add));
-
             addNoteRadioLow.setChecked(true);
             txtNoteTitle.setText("");
             txtNoteContent.setText("");
         }
     }
 
-    private void prepareFloatingActionButton(){
-        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.btn_floating_add);
+    private void prepareFloatingActionButton() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.btn_floating_add);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (globals.getSelectedListType()){
+                switch (globals.getSelectedListType()) {
                     case NOTE_ITEM:
                         setDataNoteDialog(null);
                         addNoteDialog.show();
                         break;
                     case RECORD_ITEM:
-                        clearDataRecordDialog();
+                        clearRecordDialogData();
+                        RecordingHelper.getInstance().prepareRecordFile();
+                        txtRecordDialogTitle.setText(RecordingHelper.getInstance().getRecordFileName());
                         addRecordDialog.show();
                         break;
                     case TODO_ITEM:
@@ -398,15 +401,15 @@ public class NotePadActivity extends AppCompatActivity {
         });
     }
 
-    private void prepareMenuClickListeners(){
+    private void prepareMenuClickListeners() {
         menuListenerHolder = new HashMap<>();
 
-        SwipeMenuListView.OnMenuItemClickListener noteClickListener = new SwipeMenuListView.OnMenuItemClickListener(){
+        SwipeMenuListView.OnMenuItemClickListener noteClickListener = new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 String title = listAdapters.get(NOTE_ITEM).getItem(position);
 
-                switch (index){
+                switch (index) {
                     case 0:
                         DataProvider.getInstance().deleteItem(NOTE_ITEM, title);
                         updateListAdapter(NOTE_ITEM);
@@ -421,12 +424,12 @@ public class NotePadActivity extends AppCompatActivity {
             }
         };
 
-        SwipeMenuListView.OnMenuItemClickListener todoClickListener = new SwipeMenuListView.OnMenuItemClickListener(){
+        SwipeMenuListView.OnMenuItemClickListener todoClickListener = new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 String title = listAdapters.get(TODO_ITEM).getItem(position);
 
-                switch (index){
+                switch (index) {
                     case 1:
                     case 0:
                         DataProvider.getInstance().deleteItem(TODO_ITEM, title);
@@ -437,12 +440,12 @@ public class NotePadActivity extends AppCompatActivity {
             }
         };
 
-        SwipeMenuListView.OnMenuItemClickListener recordClickListener = new SwipeMenuListView.OnMenuItemClickListener(){
+        SwipeMenuListView.OnMenuItemClickListener recordClickListener = new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 String title = listAdapters.get(RECORD_ITEM).getItem(position);
 
-                switch (index){
+                switch (index) {
                     case 0:
                         DataProvider.getInstance().deleteItem(RECORD_ITEM, title);
                         updateListAdapter(RECORD_ITEM);
@@ -457,10 +460,10 @@ public class NotePadActivity extends AppCompatActivity {
         menuListenerHolder.put(RECORD_ITEM, recordClickListener);
     }
 
-    private void prepareSwipeMenus(){
+    private void prepareSwipeMenus() {
         swipeMenuHolder = new HashMap<>();
 
-        SwipeMenuCreator notesMenu = new SwipeMenuCreator(){
+        SwipeMenuCreator notesMenu = new SwipeMenuCreator() {
             @Override
             public void create(SwipeMenu menu) {
                 SwipeMenuItem openItem = new SwipeMenuItem(context);
@@ -483,7 +486,7 @@ public class NotePadActivity extends AppCompatActivity {
             }
         };
 
-        SwipeMenuCreator todoMenu = new SwipeMenuCreator(){
+        SwipeMenuCreator todoMenu = new SwipeMenuCreator() {
             @Override
             public void create(SwipeMenu menu) {
                 SwipeMenuItem deleteItem = new SwipeMenuItem(context);
@@ -503,7 +506,7 @@ public class NotePadActivity extends AppCompatActivity {
             }
         };
 
-        SwipeMenuCreator recordMenu = new SwipeMenuCreator(){
+        SwipeMenuCreator recordMenu = new SwipeMenuCreator() {
             @Override
             public void create(SwipeMenu menu) {
                 SwipeMenuItem deleteItem = new SwipeMenuItem(context);
@@ -517,27 +520,12 @@ public class NotePadActivity extends AppCompatActivity {
             }
         };
 
-//        SwipeMenuCreator drawMenu = new SwipeMenuCreator(){
-//            @Override
-//            public void create(SwipeMenu menu) {
-//                SwipeMenuItem deleteItem = new SwipeMenuItem(context);
-//                int buttonWidthPx = globals.dp2px(res.getInteger(R.integer.list_menu_button_width_dp));
-//
-//                deleteItem.setWidth(buttonWidthPx);
-//                deleteItem.setBackground(new ColorDrawable(ContextCompat.getColor(context, R.color.list_menu_delete_back)));
-//                deleteItem.setIcon(R.drawable.ic_delete);
-//
-//                menu.addMenuItem(deleteItem);
-//            }
-//        };
-
         swipeMenuHolder.put(NOTE_ITEM, notesMenu);
         swipeMenuHolder.put(TODO_ITEM, todoMenu);
         swipeMenuHolder.put(RECORD_ITEM, recordMenu);
-        //swipeMenuHolder.put(DRAW_ITEM, drawMenu);
     }
 
-    private void prepareToggleButtons(){
+    private void prepareToggleButtons() {
         toggleButtonHolder = new HashMap<>();
 
         final CompoundButton.OnCheckedChangeListener ToggleListener = new CompoundButton.OnCheckedChangeListener() {
@@ -545,13 +533,13 @@ public class NotePadActivity extends AppCompatActivity {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(avoidRecursions) return;
+                if (avoidRecursions) return;
                 avoidRecursions = true;
 
-                for(Map.Entry<ListItemType, ToggleButton> pair : toggleButtonHolder.entrySet()){
+                for (Map.Entry<ListItemType, ToggleButton> pair : toggleButtonHolder.entrySet()) {
                     ToggleButton toggleButton = pair.getValue();
 
-                    if(buttonView.equals(toggleButton)){
+                    if (buttonView.equals(toggleButton)) {
                         ListItemType selectedType = pair.getKey();
                         Globals.getInstance().setSelectedListType(selectedType);
                         buttonView.setChecked(true);
@@ -559,7 +547,7 @@ public class NotePadActivity extends AppCompatActivity {
                         totalCounter.setText(counterDisplay);
                         listView.setMenuCreator(swipeMenuHolder.get(selectedType));
                         listView.setOnMenuItemClickListener(menuListenerHolder.get(selectedType));
-                    }else{
+                    } else {
                         toggleButton.setChecked(false);
                     }
                 }
@@ -569,22 +557,22 @@ public class NotePadActivity extends AppCompatActivity {
         };
 
         toggleButtonHolder.put(ListItemType.NOTE_ITEM, (ToggleButton) findViewById(R.id.toggle_notes));
-        toggleButtonHolder.put(TODO_ITEM,  (ToggleButton) findViewById(R.id.toggle_todo));
+        toggleButtonHolder.put(TODO_ITEM, (ToggleButton) findViewById(R.id.toggle_todo));
         toggleButtonHolder.put(RECORD_ITEM, (ToggleButton) findViewById(R.id.toggle_records));
 
-        for(ToggleButton toggleButton : toggleButtonHolder.values()){
+        for (ToggleButton toggleButton : toggleButtonHolder.values()) {
             toggleButton.setOnCheckedChangeListener(ToggleListener);
         }
 
         ((ToggleButton) findViewById(R.id.toggle_notes)).setChecked(true);
     }
 
-    private void prepareRadioGroup(){
+    private void prepareRadioGroup() {
         final RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio_group);
         rbAll = (RadioButton) findViewById(R.id.radio_low);
         rbMedHigh = (RadioButton) findViewById(R.id.radio_med);
 
-        switch (globals.getSelectedPriority()){
+        switch (globals.getSelectedPriority()) {
             case LOW:
                 rbAll.setChecked(true);
                 break;
@@ -598,15 +586,14 @@ public class NotePadActivity extends AppCompatActivity {
                 break;
         }
 
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
-        {
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(rbAll.isChecked()){
+                if (rbAll.isChecked()) {
                     globals.setSelectedPriority(Priority.LOW);
-                }else if(rbMedHigh.isChecked()){
+                } else if (rbMedHigh.isChecked()) {
                     globals.setSelectedPriority(Priority.MEDIUM);
-                }else{
+                } else {
                     globals.setSelectedPriority(Priority.HIGH);
                 }
 
@@ -615,7 +602,7 @@ public class NotePadActivity extends AppCompatActivity {
         });
     }
 
-    private void updateListAdapter(ListItemType itemType){
+    private void updateListAdapter(ListItemType itemType) {
         progressLayout.setVisibility(View.VISIBLE);
 
         listView.smoothCloseMenu();
@@ -635,7 +622,7 @@ public class NotePadActivity extends AppCompatActivity {
         });
     }
 
-    private void prepareList(){
+    private void prepareList() {
         listView = (SwipeMenuListView) findViewById(R.id.items_list);
 
         listAdapters = new HashMap<>();
@@ -650,16 +637,16 @@ public class NotePadActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(globals.getSelectedListType() == RECORD_ITEM){
-                    String title = (String)listView.getItemAtPosition(position);
+                if (globals.getSelectedListType() == RECORD_ITEM) {
+                    String title = (String) listView.getItemAtPosition(position);
                     ItemData itemData = DataProvider.getInstance().getItemData(RECORD_ITEM, title);
 
-                    if(itemData != null && itemData.getContent() != null) {
+                    if (itemData != null && itemData.getContent() != null) {
                         MediaPlayer media = itemData.getContent().getRecordContent();
                         if (media != null) {
-                            if(media.isPlaying()){
+                            if (media.isPlaying()) {
                                 AudioPlayer.getInstance().stopMedia(media);
-                            }else{
+                            } else {
                                 AudioPlayer.getInstance().stopAll();
                                 AudioPlayer.getInstance().playWithOffset(media, 0);
                             }
@@ -673,19 +660,19 @@ public class NotePadActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 ListItemType itemType = globals.getSelectedListType();
-                String title = (String)listView.getItemAtPosition(position);
+                String title = (String) listView.getItemAtPosition(position);
                 ItemData itemData;
 
-                switch (itemType){
+                switch (itemType) {
                     case NOTE_ITEM:
                         itemData = DataProvider.getInstance().getItemData(NOTE_ITEM, title);
 
-                        if(itemData != null && itemData.getContent() != null){
+                        if (itemData != null && itemData.getContent() != null) {
                             noteContentPreview.show();
 
-                            if(notePreviewTextView != null) {
+                            if (notePreviewTextView != null) {
                                 String noteContent = itemData.getContent().getNoteContent();
-                                if(noteContent.isEmpty()){
+                                if (noteContent.isEmpty()) {
                                     noteContent = res.getString(R.string.empty_note_content);
                                 }
                                 notePreviewTextView.setText(noteContent);

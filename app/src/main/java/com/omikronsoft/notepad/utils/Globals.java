@@ -1,13 +1,12 @@
-package com.omikronsoft.notepad;
+package com.omikronsoft.notepad.utils;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
+import com.omikronsoft.notepad.R;
 import com.omikronsoft.notepad.containers.Priority;
-
-import static java.lang.reflect.Array.getInt;
 
 /**
  * Created by Dariusz Lelek on 5/30/2017.
@@ -18,17 +17,15 @@ public class Globals {
     private static Globals instance;
     private Resources res;
     private DisplayMetrics metrics;
-    private float pixelDensity;
     private Priority selectedPriority;
     private SharedPreferences prefs;
     private ListItemType selectedListType;
-    private String recordSavePath;
 
-    private Globals(){
+    private Globals() {
 
     }
 
-    public void loadPrefsData(){
+    public void loadPrefsData() {
         selectedPriority = Priority.getPriorityByValue(prefs.getInt(res.getString(R.string.selected_priority_key), 0));
         selectedListType = ListItemType.getListTypeByValue(prefs.getInt(res.getString(R.string.selected_list_type_key), 0));
     }
@@ -42,11 +39,11 @@ public class Globals {
         metrics = res.getDisplayMetrics();
     }
 
-    public int getPendingRecFileNum() {
+    int getPendingRecFileNum() {
         return prefs.getInt(res.getString(R.string.pending_rec_file_num_key), 1);
     }
 
-    public void incrementPendingRecFileNum(){
+    public void incrementPendingRecFileNum() {
         int oldNum = prefs.getInt(res.getString(R.string.pending_rec_file_num_key), 1);
 
         SharedPreferences.Editor edit = prefs.edit();
@@ -78,7 +75,6 @@ public class Globals {
         edit.apply();
     }
 
-
     public void setPrefs(SharedPreferences prefs) {
         this.prefs = prefs;
     }
@@ -89,10 +85,6 @@ public class Globals {
 
     public int dp2px(int dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, metrics);
-    }
-
-    public float getPixelDensity() {
-        return metrics.density;
     }
 
     public synchronized static Globals getInstance() {

@@ -1,6 +1,6 @@
 package com.omikronsoft.notepad.containers;
 
-import com.omikronsoft.notepad.ListItemType;
+import com.omikronsoft.notepad.utils.ListItemType;
 import com.omikronsoft.notepad.utils.Utils;
 
 /**

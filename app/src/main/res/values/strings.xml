@@ -1,18 +1,28 @@
 <resources>
     <string name="app_name">NotePad</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_note_pad">NotePad</string>
 
-    <string name="title_activity_note_pad">NotePadActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-
+    <!-- UI Strings -->
     <string name="total_display_prefix">Total:</string>
     <string name="empty_note_content">This note has only title.</string>
-
     <string name="add_note_title_new">Add new note</string>
     <string name="add_note_title_edit">Edit note</string>
     <string name="add_note_button_edit">OK</string>
     <string name="add_note_button_add">ADD</string>
+    <string name="toggle_todo_name">To Do</string>
+    <string name="toggle_notes_name">Notes</string>
+    <string name="toggle_records_name">Records</string>
+    <string name="label_display_acc_importance">Display according to importance:</string>
+    <string name="label_radio_low_main">All</string>
+    <string name="label_radio_med_main">Medium+</string>
+    <string name="label_radio_high_main">Only High</string>
+
+    <string name="label_importance">Importance:</string>
+    <string name="label_radio_low_dialog">Low</string>
+    <string name="label_radio_med_dialog">Medium</string>
+    <string name="label_radio_high_dialog">High</string>
+
 
     <string name="record_file_extension">.3gp</string>
     <string name="record_file_name_prefix">Record</string>
@@ -31,5 +41,7 @@
     <string name="todo_data_key">ToDoData</string>
     <string name="record_data_key">RecordData</string>
     <string name="draw_data_key">DrawData</string>
+
+
 
 </resources>

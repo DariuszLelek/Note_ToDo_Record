@@ -5,10 +5,7 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 
-import com.omikronsoft.notepad.ApplicationContext;
-import com.omikronsoft.notepad.Globals;
 import com.omikronsoft.notepad.R;
 
 import java.io.File;
@@ -22,39 +19,40 @@ import java.io.IOException;
 public class RecordingHelper {
     private static RecordingHelper instance;
     private MediaRecorder recorder;
-    private String pendingFileName, fileExtension, fileNamePrefix;
+    private String fileExtension;
+    private String fileNamePrefix;
     private File pendingRecordFile, saveFolder;
     private MediaPlayer pendingMediaPlayer;
 
+    private final static String FILE_NAME_SEPARATOR = "_";
 
-    private final String FILE_NAME_SEPARATOR = "_";
-
-
-    private RecordingHelper(){
+    private RecordingHelper() {
         saveFolder = ApplicationContext.get().getExternalFilesDir(Context.STORAGE_SERVICE);
         fileNamePrefix = Globals.getInstance().getRes().getString(R.string.record_file_name_prefix);
         fileExtension = Globals.getInstance().getRes().getString(R.string.record_file_extension);
     }
 
-    public void prepareRecordFile(){
-        pendingFileName = fileNamePrefix + FILE_NAME_SEPARATOR + Globals.getInstance().getPendingRecFileNum() + fileExtension;
+    public void prepareRecordFile() {
+        String pendingFileName = fileNamePrefix + FILE_NAME_SEPARATOR + Globals.getInstance().getPendingRecFileNum() + fileExtension;
         pendingRecordFile = new File(saveFolder.getAbsolutePath() + "/" + pendingFileName);
 
-        if(pendingRecordFile.exists()){
-            pendingRecordFile.delete();
+        if (pendingRecordFile.exists()) {
+            if (!pendingRecordFile.delete()) {
+                // todo logger
+            }
         }
 
         pendingMediaPlayer = null;
     }
 
-    public File getRecordFile(String fileName){
+    public File getRecordFile(String fileName) {
         return new File(saveFolder.getAbsolutePath() + "/" + fileName + fileExtension);
     }
 
-    public void changePendingFileName(String newName){
+    public void changePendingFileName(String newName) {
         File newFile = new File(pendingRecordFile.getParent() + "/" + newName + fileExtension);
-        if(!pendingRecordFile.renameTo(newFile)){
-            // todo add logger
+        if (!pendingRecordFile.renameTo(newFile)) {
+            // todo logger
         }
     }
 
@@ -62,7 +60,7 @@ public class RecordingHelper {
         return pendingMediaPlayer;
     }
 
-    public String getRecordFileName(){
+    public String getRecordFileName() {
         return Utils.getInstance().getFileName(pendingRecordFile);
     }
 
@@ -70,40 +68,8 @@ public class RecordingHelper {
         return recorder != null;
     }
 
-    private MediaRecorder getRecorder(){
-        MediaRecorder recorder = new MediaRecorder();
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.HE_AAC);
-            recorder.setAudioEncodingBitRate(48000);
-        } else {
-            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-            recorder.setAudioEncodingBitRate(64000);
-        }
-
-        recorder.setAudioSamplingRate(16000);
-        recorder.setOutputFile(pendingRecordFile.getAbsolutePath());
-
-        return recorder;
-    }
-
-    public void stopFile(){
-        if(pendingMediaPlayer != null){
-            pendingMediaPlayer.pause();
-        }
-    }
-
-    public boolean isRecordEmpty(){
+    public boolean isRecordEmpty() {
         return pendingMediaPlayer == null || pendingMediaPlayer.getDuration() == 0;
-    }
-
-    public void deleteFile(){
-        stopFile();
-        if(pendingRecordFile.delete()){
-            pendingMediaPlayer = null;
-        }
     }
 
     public synchronized void startRecording() {
@@ -125,6 +91,25 @@ public class RecordingHelper {
 
         Uri url = Uri.parse(pendingRecordFile.getAbsolutePath());
         pendingMediaPlayer = MediaPlayer.create(ApplicationContext.get(), url);
+    }
+
+    private MediaRecorder getRecorder() {
+        MediaRecorder recorder = new MediaRecorder();
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.HE_AAC);
+            recorder.setAudioEncodingBitRate(48000);
+        } else {
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            recorder.setAudioEncodingBitRate(64000);
+        }
+
+        recorder.setAudioSamplingRate(16000);
+        recorder.setOutputFile(pendingRecordFile.getAbsolutePath());
+
+        return recorder;
     }
 
     public synchronized static RecordingHelper getInstance() {

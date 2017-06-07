@@ -30,7 +30,6 @@
                     android:id="@+id/txt_todo_dialog"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:padding="6dp"
                     android:text="Add new thing To Do"
                     android:textAlignment="center"
@@ -90,7 +89,7 @@
                             android:id="@+id/txt_author"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
+                            android:gravity="end"
                             android:paddingRight="50sp"
                             android:textAlignment="textEnd"
                             android:textColor="@android:color/darker_gray"
@@ -113,17 +112,15 @@
                     android:id="@+id/textView3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0"
                     android:background="@color/list_back"
                     android:paddingTop="12dp"
-                    android:text="Importance:"
+                    android:text="@string/label_importance"
                     android:textAlignment="center" />
 
                 <RadioGroup
                     android:id="@+id/add_radio_buttons"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0"
                     android:background="@color/list_back"
                     android:checkedButton="@+id/add_item_radio_low"
                     android:orientation="horizontal"
@@ -137,27 +134,26 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Low" />
+                        android:text="@string/label_radio_low_dialog" />
 
                     <RadioButton
                         android:id="@+id/add_item_radio_med"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Medium" />
+                        android:text="@string/label_radio_med_dialog" />
 
                     <RadioButton
                         android:id="@+id/add_item_radio_high"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="High" />
+                        android:text="@string/label_radio_high_dialog" />
                 </RadioGroup>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0"
                     android:background="@color/list_back"
                     android:orientation="horizontal"
                     android:paddingBottom="12dp"

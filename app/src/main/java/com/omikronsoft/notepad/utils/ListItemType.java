@@ -1,10 +1,6 @@
-package com.omikronsoft.notepad;
+package com.omikronsoft.notepad.utils;
 
-import com.omikronsoft.notepad.containers.Priority;
-
-import static com.omikronsoft.notepad.containers.Priority.HIGH;
-import static com.omikronsoft.notepad.containers.Priority.LOW;
-import static com.omikronsoft.notepad.containers.Priority.MEDIUM;
+import com.omikronsoft.notepad.R;
 
 /**
  * Created by Dariusz Lelek on 5/30/2017.

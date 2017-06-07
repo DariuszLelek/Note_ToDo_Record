@@ -5,8 +5,6 @@ import android.media.MediaPlayer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.R.attr.offset;
-
 /**
  * Created by Dariusz Lelek on 5/27/2017.
  * dariusz.lelek@gmail.com
@@ -15,23 +13,9 @@ import static android.R.attr.offset;
 public class AudioPlayer {
     private static AudioPlayer instance;
     private final List<MediaPlayer> activeMedia;
-    private MediaPlayer listItemCurrentlyPlaying;
 
     private AudioPlayer() {
         activeMedia = new ArrayList<>();
-    }
-
-    public void playListItem(MediaPlayer player, int offset) {
-        stopPlayingListItem();
-        listItemCurrentlyPlaying = player;
-        listItemCurrentlyPlaying.seekTo(offset);
-        listItemCurrentlyPlaying.start();
-    }
-
-    public void stopPlayingListItem() {
-        if (listItemCurrentlyPlaying != null && listItemCurrentlyPlaying.isPlaying()) {
-            listItemCurrentlyPlaying.pause();
-        }
     }
 
     public void playWithOffset(MediaPlayer player, int offset) {

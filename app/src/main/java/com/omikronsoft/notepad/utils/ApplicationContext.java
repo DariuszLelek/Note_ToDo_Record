@@ -1,4 +1,4 @@
-package com.omikronsoft.notepad;
+package com.omikronsoft.notepad.utils;
 
 import android.content.Context;
 

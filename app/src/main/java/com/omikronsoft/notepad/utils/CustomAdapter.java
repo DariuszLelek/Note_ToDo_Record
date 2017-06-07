@@ -1,4 +1,4 @@
-package com.omikronsoft.notepad;
+package com.omikronsoft.notepad.utils;
 
 import android.content.Context;
 import android.view.View;
@@ -7,6 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.omikronsoft.notepad.R;
 import com.omikronsoft.notepad.containers.ItemData;
 import com.omikronsoft.notepad.containers.Priority;
 import com.omikronsoft.notepad.painting.PaintingResources;
@@ -73,12 +74,12 @@ public class CustomAdapter extends BaseAdapter {
         return convertView;
     }
 
-    class ViewHolder {
+    private class ViewHolder {
         ImageView iv_icon;
         TextView tv_title;
         TextView tv_datetime;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             iv_icon = (ImageView) view.findViewById(R.id.iv_icon);
             tv_title = (TextView) view.findViewById(R.id.tv_title);
             tv_datetime = (TextView) view.findViewById(R.id.tv_datetime);

@@ -44,9 +44,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="ToggleButton"
-                        android:textOff="Notes"
-                        android:textOn="Notes"
+                        android:textOff="@string/toggle_notes_name"
+                        android:textOn="@string/toggle_notes_name"
                         android:textSize="18sp" />
 
                     <ToggleButton
@@ -54,9 +53,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="ToggleButton"
-                        android:textOff="To Do"
-                        android:textOn="To Do"
+                        android:textOff="@string/toggle_todo_name"
+                        android:textOn="@string/toggle_todo_name"
                         android:textSize="18sp" />
 
                     <ToggleButton
@@ -64,9 +62,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="ToggleButton"
-                        android:textOff="Record"
-                        android:textOn="Record"
+                        android:textOff="@string/toggle_records_name"
+                        android:textOn="@string/toggle_records_name"
                         android:textSize="18sp" />
 
                 </LinearLayout>
@@ -102,8 +99,7 @@
                         style="@style/Widget.AppCompat.ProgressBar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1" />
+                        android:layout_gravity="center"/>
                 </FrameLayout>
             </FrameLayout>
 
@@ -124,7 +120,7 @@
                         android:paddingLeft="2sp"
                         android:paddingRight="2sp"
                         android:paddingTop="2dp"
-                        android:text="Total:"
+                        android:text="@string/total_display_prefix"
                         android:textAlignment="center"
                         android:textColor="@color/toggle_radio_back"
                         android:textSize="14sp" />
@@ -134,7 +130,7 @@
                     android:id="@+id/floating_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|right"
+                    android:layout_gravity="bottom|end"
                     android:padding="16sp">
 
                     <android.support.design.widget.FloatingActionButton
@@ -176,9 +172,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="1"
                         android:paddingTop="4dp"
-                        android:text="Display according to importance:"
+                        android:text="@string/label_display_acc_importance"
                         android:textAlignment="center"
                         android:textColor="@color/main_layout"
                         android:textSize="14sp" />
@@ -193,7 +188,6 @@
                         android:id="@+id/radio_group"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
                         android:orientation="horizontal"
                         android:paddingBottom="4sp"
                         android:paddingLeft="8sp"
@@ -205,7 +199,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="All"
+                            android:text="@string/label_radio_low_main"
                             android:textSize="16sp" />
 
                         <RadioButton
@@ -213,7 +207,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Medium+"
+                            android:text="@string/label_radio_med_main"
                             android:textColor="@color/list_icon_medium_priority"
                             android:textSize="16sp" />
 
@@ -223,7 +217,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom"
                             android:layout_weight="1"
-                            android:text="Only High"
+                            android:text="@string/label_radio_high_main"
                             android:textColor="@color/list_icon_high_priority"
                             android:textSize="16sp" />
 

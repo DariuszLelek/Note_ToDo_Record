@@ -2,6 +2,7 @@ package com.omikronsoft.notepad.utils;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by Dariusz Lelek on 5/30/2017.
@@ -11,40 +12,34 @@ import java.util.Calendar;
 public class Utils {
     private static Utils instance;
 
-    private final String DATE_SEPARATOR = "/";
+    private final static String DATE_SEPARATOR = "/";
+    private final static String TIME_SEPARATOR = ":";
 
-    public String getFormattedDate(long timeStamp){
+    public String getFormattedDate(long timeStamp) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeStamp);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(calendar.get(Calendar.DAY_OF_MONTH)).append(DATE_SEPARATOR);
-        sb.append(String.format("%02d", calendar.get(Calendar.MONTH) + 1)).append(DATE_SEPARATOR);
-        sb.append(calendar.get(Calendar.YEAR));
-
-        return sb.toString();
+        return String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + DATE_SEPARATOR +
+                String.format(Locale.ENGLISH, "%02d", calendar.get(Calendar.MONTH) + 1) + DATE_SEPARATOR +
+                calendar.get(Calendar.YEAR);
     }
 
-    public String getUpdatedTimer(String timer){
-        String[] timerParts = timer.split(":");
+    public String getUpdatedTimer(String timer) {
+        String[] timerParts = timer.split(TIME_SEPARATOR);
         int minutes = Integer.parseInt(timerParts[0]);
         int seconds = Integer.parseInt(timerParts[1]);
 
-        seconds ++;
-        if(seconds == 60){
+        seconds++;
+        if (seconds == 60) {
             seconds = 0;
             minutes++;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(minutes < 10 ? "0" + String.valueOf(minutes) : String.valueOf(minutes));
-        sb.append(":");
-        sb.append(seconds < 10 ? "0" + String.valueOf(seconds) : String.valueOf(seconds));
-
-        return sb.toString();
+        return (minutes < 10 ? "0" + String.valueOf(minutes) : String.valueOf(minutes)) + TIME_SEPARATOR +
+                (seconds < 10 ? "0" + String.valueOf(seconds) : String.valueOf(seconds));
     }
 
-    public String getFileName(File file) {
+    String getFileName(File file) {
         String name = file.getName();
         int pos = name.lastIndexOf(".");
         if (pos > 0) {
@@ -53,7 +48,7 @@ public class Utils {
         return name;
     }
 
-    private Utils(){
+    private Utils() {
 
     }
 
