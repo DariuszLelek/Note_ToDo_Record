@@ -6,11 +6,13 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -33,13 +35,14 @@ import com.omikronsoft.notepad.containers.Content;
 import com.omikronsoft.notepad.containers.ItemData;
 import com.omikronsoft.notepad.containers.Priority;
 import com.omikronsoft.notepad.providers.DataProvider;
+import com.omikronsoft.notepad.utils.AudioPlayer;
 import com.omikronsoft.notepad.utils.RecordingHelper;
 import com.omikronsoft.notepad.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.omikronsoft.notepad.ListItemType.DRAW_ITEM;
+import static android.R.id.list;
 import static com.omikronsoft.notepad.ListItemType.NOTE_ITEM;
 import static com.omikronsoft.notepad.ListItemType.RECORD_ITEM;
 import static com.omikronsoft.notepad.ListItemType.TODO_ITEM;
@@ -59,7 +62,7 @@ public class NotePadActivity extends AppCompatActivity {
     private Map<ListItemType, SwipeMenuListView.OnMenuItemClickListener> menuListenerHolder;
     private Map<ListItemType, CustomAdapter> listAdapters;
     private DataProvider dataProvider;
-    private TextView totalCounter, notePreviewTextView, quote, author, txtNoteTitle, txtNoteContent, txtNoteDialogTitle, txtToDoTitle, recTimer;
+    private TextView totalCounter, notePreviewTextView, quote, author, txtNoteTitle, txtNoteContent, txtNoteDialogTitle, txtRecordDialogTitle, txtToDoDialogTitle, recTimer;
     private ItemData editedItem;
     private String totalCounterPrefix, counterDisplay;
     private Dialog noteContentPreview, addNoteDialog, addToDoDialog, addRecordDialog;
@@ -86,6 +89,7 @@ public class NotePadActivity extends AppCompatActivity {
         globals.setPrefs(prefs);
         globals.setRes(res);
         globals.loadPrefsData();
+
 
         dataProvider = DataProvider.getInstance();
 
@@ -175,7 +179,7 @@ public class NotePadActivity extends AppCompatActivity {
         addToDoDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         addToDoDialog.setContentView(R.layout.add_todo_layout);
 
-        txtToDoTitle = (TextView) (addToDoDialog).findViewById(R.id.txt_todo_title);
+        txtToDoDialogTitle = (TextView) (addToDoDialog).findViewById(R.id.txt_todo_title);
 
         addToDoRadioLow = (RadioButton)((addToDoDialog).findViewById(R.id.add_item_radio_low));
         addToDoRadioMed = (RadioButton)((addToDoDialog).findViewById(R.id.add_item_radio_med));
@@ -194,7 +198,7 @@ public class NotePadActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                String title = txtToDoTitle.getText().toString();
+                String title = txtToDoDialogTitle.getText().toString();
                 int priority = addToDoRadioLow.isChecked() ? 0 : (addToDoRadioMed.isChecked() ? 1 : 2);
 
                 if (!title.isEmpty()) {
@@ -215,34 +219,60 @@ public class NotePadActivity extends AppCompatActivity {
         addRecordDialog.setContentView(R.layout.add_record_layout);
 
         recTimer = (TextView)(addRecordDialog).findViewById(R.id.txt_record_time);
+        txtRecordDialogTitle = (TextView)(addRecordDialog).findViewById(R.id.txt_record_title);
+
+        final RadioButton addRecRadioLow = (RadioButton)((addRecordDialog).findViewById(R.id.add_item_radio_low));
+        final RadioButton addRecRadioMed = (RadioButton)((addRecordDialog).findViewById(R.id.add_item_radio_med));
 
         final ImageView recImage = (ImageView)(addRecordDialog).findViewById(R.id.image_mic);
         playRec = (ImageButton)(addRecordDialog).findViewById(R.id.btn_play_rec);
         stopRec = (ImageButton)(addRecordDialog).findViewById(R.id.btn_stop_rec);
         delRec = (ImageButton)(addRecordDialog).findViewById(R.id.btn_delete_rec);
+//
+//        recImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//
+//
+//                if(RecordingHelper.getInstance().isRecording()){
+//                    recImage.setColorFilter(Color.WHITE);
+//                    setDataRecordButtons(true);
+//                    RecordingHelper.getInstance().stopRecording();
+//                }else{
+//                    recImage.setColorFilter(Color.RED);
+//                    recTimer.setText(res.getString(R.string.record_timer_zero_time));
+//                    startUpdateTimerThread();
+//                    setDataRecordButtons(false);
+//                    RecordingHelper.getInstance().startRecording();
+//                }
+//            }
+//        });
 
-        recImage.setOnClickListener(new View.OnClickListener() {
+        recImage.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                if(RecordingHelper.getInstance().isRecording()){
-                    RecordingHelper.getInstance().stopRecording();
-                    recImage.setColorFilter(Color.WHITE);
-
-                    setDataRecordDialog(true);
-                }else{
-                    RecordingHelper.getInstance().startRecording();
-                    recImage.setColorFilter(Color.RED);
-                    recTimer.setText("00:00");
-                    startUpdateTimerThread();
-                    setDataRecordDialog(false);
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    if(RecordingHelper.getInstance().isRecording()){
+                        recImage.setColorFilter(Color.WHITE);
+                        setDataRecordButtons(true);
+                        RecordingHelper.getInstance().stopRecording();
+                    }else{
+                        recImage.setColorFilter(Color.RED);
+                        recTimer.setText(res.getString(R.string.record_timer_zero_time));
+                        startUpdateTimerThread();
+                        setDataRecordButtons(false);
+                        RecordingHelper.getInstance().startRecording();
+                    }
                 }
+                return false;
             }
         });
 
         playRec.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RecordingHelper.getInstance().playFile();
+                //RecordingHelper.getInstance().playPendingFile();
             }
         });
 
@@ -257,9 +287,45 @@ public class NotePadActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // todo process delete
-                setDataRecordDialog(false);
-                recTimer.setText("00:00");
+                setDataRecordButtons(false);
+                recTimer.setText(res.getString(R.string.record_timer_zero_time));
                 RecordingHelper.getInstance().deleteFile();
+            }
+        });
+
+        (addRecordDialog).findViewById(R.id.btn_cancel_add_rec).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addRecordDialog.hide();
+            }
+        });
+
+        (addRecordDialog).findViewById(R.id.btn_add_rec).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                String title = txtRecordDialogTitle.getText().toString();
+                int priority = addRecRadioLow.isChecked() ? 0 : (addRecRadioMed.isChecked() ? 1 : 2);
+
+                if (!title.isEmpty()) {
+                    if (!DataProvider.getInstance().itemExists(title, RECORD_ITEM)
+                            && !RecordingHelper.getInstance().isRecordEmpty()
+                            && !RecordingHelper.getInstance().isRecording()) {
+                        if(title.equals(RecordingHelper.getInstance().getRecordFileName())){
+                            Globals.getInstance().incrementPendingRecFileNum();
+                        }else{
+                            // todo change pending file name
+                            RecordingHelper.getInstance().changePendingFileName(title);
+                        }
+
+                        ItemData id = new ItemData(RECORD_ITEM, title, priority, System.currentTimeMillis());
+                        Content content = new Content();
+                        content.setRecordContent(RecordingHelper.getInstance().getPendingMediaPlayer());
+                        id.setContent(content);
+                        DataProvider.getInstance().addItemData(id);
+                        hideDialogAndRefreshDisplay(addRecordDialog, RECORD_ITEM);
+                    }
+                }
             }
         });
     }
@@ -296,16 +362,26 @@ public class NotePadActivity extends AppCompatActivity {
         updateListAdapter(itemType);
     }
 
-    private void setDataToDoDialog(){
+    private void clearDataToDoDialog(){
         int rnd = QuoteProvider.getRandomInt();
         quote.setText(QuoteProvider.getQuote(rnd));
         author.setText(QuoteProvider.getAuthor(rnd));
 
-        txtToDoTitle.setText("");
+        txtToDoDialogTitle.setText("");
         addToDoRadioLow.setChecked(true);
     }
 
-    private void setDataRecordDialog(boolean enabled){
+    private void clearDataRecordDialog(){
+        setDataRecordButtons(false);
+        recTimer.setText(res.getString(R.string.record_timer_zero_time));
+
+        ((RadioButton)((addRecordDialog).findViewById(R.id.add_item_radio_low))).setChecked(true);
+
+        RecordingHelper.getInstance().prepareRecordFile();
+        txtRecordDialogTitle.setText(RecordingHelper.getInstance().getRecordFileName());
+    }
+
+    private void setDataRecordButtons(boolean enabled){
         playRec.setEnabled(enabled);
         stopRec.setEnabled(enabled);
         delRec.setEnabled(enabled);
@@ -349,17 +425,18 @@ public class NotePadActivity extends AppCompatActivity {
             public void onClick(View v) {
                 switch (globals.getSelectedListType()){
                     case DRAW_ITEM:
+                        // todo
                         break;
                     case NOTE_ITEM:
                         setDataNoteDialog(null);
                         addNoteDialog.show();
                         break;
                     case RECORD_ITEM:
-                        setDataRecordDialog(false);
+                        clearDataRecordDialog();
                         addRecordDialog.show();
                         break;
                     case TODO_ITEM:
-                        setDataToDoDialog();
+                        clearDataToDoDialog();
                         addToDoDialog.show();
                         break;
                     default:
@@ -424,25 +501,25 @@ public class NotePadActivity extends AppCompatActivity {
         };
 
 
-        SwipeMenuListView.OnMenuItemClickListener drawClickListener = new SwipeMenuListView.OnMenuItemClickListener(){
-            @Override
-            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-                String title = listAdapters.get(DRAW_ITEM).getItem(position);
-
-                switch (index){
-                    case 0:
-                        DataProvider.getInstance().deleteItem(DRAW_ITEM, title);
-                        updateListAdapter(DRAW_ITEM);
-                        break;
-                }
-                return false;
-            }
-        };
+//        SwipeMenuListView.OnMenuItemClickListener drawClickListener = new SwipeMenuListView.OnMenuItemClickListener(){
+//            @Override
+//            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+//                String title = listAdapters.get(DRAW_ITEM).getItem(position);
+//
+//                switch (index){
+//                    case 0:
+//                        DataProvider.getInstance().deleteItem(DRAW_ITEM, title);
+//                        updateListAdapter(DRAW_ITEM);
+//                        break;
+//                }
+//                return false;
+//            }
+//        };
 
         menuListenerHolder.put(NOTE_ITEM, noteClickListener);
         menuListenerHolder.put(TODO_ITEM, todoClickListener);
         menuListenerHolder.put(RECORD_ITEM, recordClickListener);
-        menuListenerHolder.put(DRAW_ITEM, drawClickListener);
+        //menuListenerHolder.put(DRAW_ITEM, drawClickListener);
     }
 
     private void prepareSwipeMenus(){
@@ -505,24 +582,24 @@ public class NotePadActivity extends AppCompatActivity {
             }
         };
 
-        SwipeMenuCreator drawMenu = new SwipeMenuCreator(){
-            @Override
-            public void create(SwipeMenu menu) {
-                SwipeMenuItem deleteItem = new SwipeMenuItem(context);
-                int buttonWidthPx = globals.dp2px(res.getInteger(R.integer.list_menu_button_width_dp));
-
-                deleteItem.setWidth(buttonWidthPx);
-                deleteItem.setBackground(new ColorDrawable(ContextCompat.getColor(context, R.color.list_menu_delete_back)));
-                deleteItem.setIcon(R.drawable.ic_delete);
-
-                menu.addMenuItem(deleteItem);
-            }
-        };
+//        SwipeMenuCreator drawMenu = new SwipeMenuCreator(){
+//            @Override
+//            public void create(SwipeMenu menu) {
+//                SwipeMenuItem deleteItem = new SwipeMenuItem(context);
+//                int buttonWidthPx = globals.dp2px(res.getInteger(R.integer.list_menu_button_width_dp));
+//
+//                deleteItem.setWidth(buttonWidthPx);
+//                deleteItem.setBackground(new ColorDrawable(ContextCompat.getColor(context, R.color.list_menu_delete_back)));
+//                deleteItem.setIcon(R.drawable.ic_delete);
+//
+//                menu.addMenuItem(deleteItem);
+//            }
+//        };
 
         swipeMenuHolder.put(NOTE_ITEM, notesMenu);
         swipeMenuHolder.put(TODO_ITEM, todoMenu);
         swipeMenuHolder.put(RECORD_ITEM, recordMenu);
-        swipeMenuHolder.put(DRAW_ITEM, drawMenu);
+        //swipeMenuHolder.put(DRAW_ITEM, drawMenu);
     }
 
     private void prepareToggleButtons(){
@@ -559,7 +636,7 @@ public class NotePadActivity extends AppCompatActivity {
         toggleButtonHolder.put(ListItemType.NOTE_ITEM, (ToggleButton) findViewById(R.id.toggle_notes));
         toggleButtonHolder.put(TODO_ITEM,  (ToggleButton) findViewById(R.id.toggle_todo));
         toggleButtonHolder.put(RECORD_ITEM, (ToggleButton) findViewById(R.id.toggle_records));
-        toggleButtonHolder.put(DRAW_ITEM, (ToggleButton) findViewById(R.id.toggle_draw));
+        //toggleButtonHolder.put(DRAW_ITEM, (ToggleButton) findViewById(R.id.toggle_draw));
 
         for(ToggleButton toggleButton : toggleButtonHolder.values()){
             toggleButton.setOnCheckedChangeListener(ToggleListener);
@@ -605,9 +682,9 @@ public class NotePadActivity extends AppCompatActivity {
     }
 
     private void updateListAdapter(ListItemType itemType){
-        listView.smoothCloseMenu();
-        displayProgressIndicator();
+        progressLayout.setVisibility(View.VISIBLE);
 
+        listView.smoothCloseMenu();
         CustomAdapter adapter = listAdapters.get(itemType);
         adapter.updateList(DataProvider.getInstance().getTitleListByPriority(itemType));
         listView.setAdapter(adapter);
@@ -615,10 +692,7 @@ public class NotePadActivity extends AppCompatActivity {
 
         counterDisplay = totalCounterPrefix + " " + DataProvider.getInstance().getTotalItems(itemType);
         totalCounter.setText(counterDisplay);
-    }
 
-    private void displayProgressIndicator(){
-        progressLayout.setVisibility(View.VISIBLE);
         listView.post(new Runnable() {
             @Override
             public void run() {
@@ -634,44 +708,77 @@ public class NotePadActivity extends AppCompatActivity {
         listAdapters.put(NOTE_ITEM, new CustomAdapter(dataProvider.getTitleListByPriority(NOTE_ITEM), context, NOTE_ITEM));
         listAdapters.put(TODO_ITEM, new CustomAdapter(dataProvider.getTitleListByPriority(TODO_ITEM), context, TODO_ITEM));
         listAdapters.put(RECORD_ITEM, new CustomAdapter(dataProvider.getTitleListByPriority(RECORD_ITEM), context, RECORD_ITEM));
-        listAdapters.put(DRAW_ITEM, new CustomAdapter(dataProvider.getTitleListByPriority(DRAW_ITEM), context, DRAW_ITEM));
+        //listAdapters.put(DRAW_ITEM, new CustomAdapter(dataProvider.getTitleListByPriority(DRAW_ITEM), context, DRAW_ITEM));
 
         listView.setAdapter(listAdapters.get(globals.getSelectedListType()));
-
-        listView.setOnSwipeListener(new SwipeMenuListView.OnSwipeListener() {
-            @Override
-            public void onSwipeStart(int position) {
-
-            }
-
-            @Override
-            public void onSwipeEnd(int position) {
-
-            }
-        });
-
         listView.setSwipeDirection(SwipeMenuListView.DIRECTION_RIGHT);
         listView.setLongClickable(true);
+
+        listView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                ListItemType itemType = globals.getSelectedListType();
+
+                if(itemType == RECORD_ITEM){
+                    switch(event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            int position = listView.pointToPosition((int)event.getX(), (int)event.getY());
+                            String title = (String)listView.getItemAtPosition(position);
+
+                            ItemData itemData = DataProvider.getInstance().getItemData(RECORD_ITEM, title);
+
+                            if(itemData != null && itemData.getContent() != null){
+                                MediaPlayer media = itemData.getContent().getRecordContent();
+                                if(media != null){
+                                    AudioPlayer.getInstance().playWithOffset(media, 0);
+                                }
+                            }
+
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            int position2 = listView.pointToPosition((int)event.getX(), (int)event.getY());
+                            String title2 = (String)listView.getItemAtPosition(position2);
+
+                            if(itemType == RECORD_ITEM){
+                                AudioPlayer.getInstance().stopAll();
+                            }
+                            break;
+                    }
+                }
+
+                return false;
+            }
+        });
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if(globals.getSelectedListType() == NOTE_ITEM){
-                    String title = (String)listView.getItemAtPosition(position);
-                    ItemData itemData = DataProvider.getInstance().getItemData(NOTE_ITEM, title);
+                ListItemType itemType = globals.getSelectedListType();
+                String title = (String)listView.getItemAtPosition(position);
+                ItemData itemData;
 
-                    if(itemData != null && itemData.getContent() != null){
-                        noteContentPreview.show();
+                switch (itemType){
+                    case NOTE_ITEM:
+                        itemData = DataProvider.getInstance().getItemData(NOTE_ITEM, title);
 
-                        if(notePreviewTextView != null) {
-                            String noteContent = itemData.getContent().getNoteContent();
-                            if(noteContent.isEmpty()){
-                                noteContent = res.getString(R.string.empty_note_content);
+                        if(itemData != null && itemData.getContent() != null){
+                            noteContentPreview.show();
+
+                            if(notePreviewTextView != null) {
+                                String noteContent = itemData.getContent().getNoteContent();
+                                if(noteContent.isEmpty()){
+                                    noteContent = res.getString(R.string.empty_note_content);
+                                }
+                                notePreviewTextView.setText(noteContent);
                             }
-                            notePreviewTextView.setText(noteContent);
                         }
-                    }
+                        break;
+                    case RECORD_ITEM:
+                        break;
+                    default:
+                        break;
                 }
+
                 return false;
             }
         });

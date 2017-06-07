@@ -14,12 +14,17 @@
     <string name="add_note_button_edit">OK</string>
     <string name="add_note_button_add">ADD</string>
 
+    <string name="record_file_extension">.3gp</string>
+    <string name="record_file_name_prefix">Record</string>
+    <string name="record_timer_zero_time">00:00</string>
+
     <!-- Shared Prefs -->
     <string name="shared_pref_data_separator">,</string>
 
     <!-- Shared Prefs Keys -->
     <string name="shared_pref_key">NotePad</string>
     <string name="selected_priority_key">SelectedPriority</string>
+    <string name="pending_rec_file_num_key">PendingRecFileNum</string>
     <string name="selected_list_type_key">SelectedListType</string>
     <string name="note_data_key">NoteData</string>
     <string name="note_content_key_prefix">NoteContent=</string>

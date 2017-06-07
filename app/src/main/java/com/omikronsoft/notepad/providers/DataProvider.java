@@ -1,14 +1,19 @@
 package com.omikronsoft.notepad.providers;
 
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
+import android.net.Uri;
 
+import com.omikronsoft.notepad.ApplicationContext;
 import com.omikronsoft.notepad.Globals;
 import com.omikronsoft.notepad.ListItemType;
 import com.omikronsoft.notepad.R;
 import com.omikronsoft.notepad.containers.Content;
 import com.omikronsoft.notepad.containers.ItemData;
 import com.omikronsoft.notepad.containers.Priority;
+import com.omikronsoft.notepad.utils.RecordingHelper;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -151,6 +156,7 @@ public class DataProvider {
             case DRAW_ITEM:
                 break;
             case RECORD_ITEM:
+                // files are saved at record time when dialog is displayed
                 break;
             default:
             case TODO_ITEM:
@@ -167,6 +173,15 @@ public class DataProvider {
                 content.setNoteContent(globals.getPrefs().getString(noteContentPrefix+title, ""));
                 break;
             case RECORD_ITEM:
+                File recordFile = RecordingHelper.getInstance().getRecordFile(title);
+                if(recordFile != null){
+                    Uri url = Uri.parse(recordFile.getAbsolutePath());
+                    MediaPlayer media = MediaPlayer.create(ApplicationContext.get(), url);
+                    if(media != null){
+                        content = new Content();
+                        content.setRecordContent(media);
+                    }
+                }
                 break;
             case DRAW_ITEM:
                 break;

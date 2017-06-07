@@ -47,7 +47,7 @@
                     android:padding="6dp">
 
                     <EditText
-                        android:id="@+id/txt_todo_title"
+                        android:id="@+id/txt_record_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -118,7 +118,8 @@
                 android:layout_height="80sp"
                 android:layout_weight="0"
                 android:orientation="horizontal"
-                android:padding="6dp">
+                android:padding="6dp"
+                android:visibility="invisible">
 
                 <ImageButton
                     android:id="@+id/btn_play_rec"
@@ -217,14 +218,14 @@
                     android:paddingRight="12dp">
 
                     <Button
-                        android:id="@+id/btn_add_todo"
+                        android:id="@+id/btn_add_rec"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Add" />
 
                     <Button
-                        android:id="@+id/btn_cancel_add_todo"
+                        android:id="@+id/btn_cancel_add_rec"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

@@ -1,5 +1,6 @@
 package com.omikronsoft.notepad.utils;
 
+import java.io.File;
 import java.util.Calendar;
 
 /**
@@ -41,6 +42,15 @@ public class Utils {
         sb.append(seconds < 10 ? "0" + String.valueOf(seconds) : String.valueOf(seconds));
 
         return sb.toString();
+    }
+
+    public String getFileName(File file) {
+        String name = file.getName();
+        int pos = name.lastIndexOf(".");
+        if (pos > 0) {
+            name = name.substring(0, pos);
+        }
+        return name;
     }
 
     private Utils(){

@@ -22,6 +22,7 @@ public class Globals {
     private Priority selectedPriority;
     private SharedPreferences prefs;
     private ListItemType selectedListType;
+    private String recordSavePath;
 
     private Globals(){
 
@@ -39,6 +40,18 @@ public class Globals {
     public void setRes(Resources res) {
         this.res = res;
         metrics = res.getDisplayMetrics();
+    }
+
+    public int getPendingRecFileNum() {
+        return prefs.getInt(res.getString(R.string.pending_rec_file_num_key), 1);
+    }
+
+    public void incrementPendingRecFileNum(){
+        int oldNum = prefs.getInt(res.getString(R.string.pending_rec_file_num_key), 1);
+
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putInt(res.getString(R.string.pending_rec_file_num_key), oldNum + 1);
+        edit.apply();
     }
 
     public Priority getSelectedPriority() {
