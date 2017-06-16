@@ -76,7 +76,6 @@ public class NotePadActivity extends AppCompatActivity {
     private Dialog noteContentPreview, addNoteDialog, addToDoDialog, addRecordDialog;
     private Button btnAddNote;
     private boolean updateTimerThreadRunning;
-    private AdView adView;
 
     private Globals globals;
     private Context context;
@@ -136,7 +135,8 @@ public class NotePadActivity extends AppCompatActivity {
             adParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             adParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
 
-            adView = new AdView(this);
+            AdRequest adRequest;
+            AdView adView = new AdView(this);
             adView.setAdSize(AdSize.SMART_BANNER);
             adView.setAdUnitId(getResources().getString(R.string.add_unit_id));
             adView.setBackgroundColor(Color.TRANSPARENT);
@@ -145,9 +145,11 @@ public class NotePadActivity extends AppCompatActivity {
             FrameLayout bannerLayout = (FrameLayout)findViewById(R.id.layout_banner);
             bannerLayout.addView(adView);
 
-            // Test Ads
-            AdRequest adRequest = new AdRequest.Builder().addTestDevice(getResources().getString(R.string.test_device_id)).build();
-            //AdRequest adRequest = new AdRequest.Builder().build();
+            if(Globals.TEST_ADS_ONLY){
+                adRequest = new AdRequest.Builder().addTestDevice(getResources().getString(R.string.test_device_id)).build();
+            }else{
+                adRequest = new AdRequest.Builder().build();
+            }
 
             adView.loadAd(adRequest);
         }
