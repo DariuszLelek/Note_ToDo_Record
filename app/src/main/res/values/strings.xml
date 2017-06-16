@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">NotePad</string>
+    <string name="app_name">Note ToDo Record</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_note_pad">NotePad</string>
+    <string name="title_activity_note_pad">Note ToDo Record</string>
 
     <!-- UI Strings -->
     <string name="total_display_prefix">Total:</string>

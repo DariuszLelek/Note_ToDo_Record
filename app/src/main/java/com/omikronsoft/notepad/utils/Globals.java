@@ -22,7 +22,7 @@ public class Globals {
     private ListItemType selectedListType;
 
     public final static boolean ADS_ENABLED = true;
-    public final static boolean TEST_ADS_ONLY = true;
+    public final static boolean TEST_ADS_ONLY = false;
 
     private Globals() {
 
