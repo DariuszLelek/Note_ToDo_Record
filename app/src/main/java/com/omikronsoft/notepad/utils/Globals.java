@@ -21,6 +21,8 @@ public class Globals {
     private SharedPreferences prefs;
     private ListItemType selectedListType;
 
+    public final static boolean ADS_ENABLED = true;
+
     private Globals() {
 
     }

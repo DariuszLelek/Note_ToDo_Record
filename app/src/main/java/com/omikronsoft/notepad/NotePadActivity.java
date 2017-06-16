@@ -24,6 +24,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -31,6 +32,10 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.omikronsoft.notepad.containers.Content;
 import com.omikronsoft.notepad.containers.ItemData;
 import com.omikronsoft.notepad.containers.Priority;
@@ -71,6 +76,7 @@ public class NotePadActivity extends AppCompatActivity {
     private Dialog noteContentPreview, addNoteDialog, addToDoDialog, addRecordDialog;
     private Button btnAddNote;
     private boolean updateTimerThreadRunning;
+    private AdView adView;
 
     private Globals globals;
     private Context context;
@@ -91,11 +97,9 @@ public class NotePadActivity extends AppCompatActivity {
         globals.setRes(res);
         globals.loadPrefsData();
 
-
         dataProvider = DataProvider.getInstance();
-
-        totalCounterPrefix = res.getString(R.string.total_display_prefix);
         setContentView(R.layout.activity_note_pad);
+        totalCounterPrefix = res.getString(R.string.total_display_prefix);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         progressLayout = (FrameLayout) findViewById(R.id.progress_layout);
@@ -118,6 +122,35 @@ public class NotePadActivity extends AppCompatActivity {
         prepareRadioGroup();
         prepareToggleButtons();
         prepareFloatingActionButton();
+
+        prepareAds();
+    }
+
+    private void prepareAds(){
+        if(Globals.ADS_ENABLED){
+            MobileAds.initialize(this, getResources().getString(R.string.app_id));
+
+            RelativeLayout.LayoutParams adParams = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.WRAP_CONTENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+            adParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            adParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+
+            adView = new AdView(this);
+            adView.setAdSize(AdSize.SMART_BANNER);
+            adView.setAdUnitId(getResources().getString(R.string.add_unit_id));
+            adView.setBackgroundColor(Color.TRANSPARENT);
+            adView.setLayoutParams(adParams);
+
+            FrameLayout bannerLayout = (FrameLayout)findViewById(R.id.layout_banner);
+            bannerLayout.addView(adView);
+
+            // Test Ads
+            AdRequest adRequest = new AdRequest.Builder().addTestDevice(getResources().getString(R.string.test_device_id)).build();
+            //AdRequest adRequest = new AdRequest.Builder().build();
+
+            adView.loadAd(adRequest);
+        }
     }
 
     private void prepareAddNoteDialog() {
